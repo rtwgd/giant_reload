@@ -70,7 +70,7 @@ body.mouse-locked,body.mouse-locked *{cursor:none!important}
 .overlay{position:fixed;inset:0;z-index:20;overflow-y:auto;touch-action:pan-y;color:var(--ink);background:var(--paper) linear-gradient(#0000 23px,#2a24200f 24px) 0 0/24px 24px,linear-gradient(90deg,#0000 23px,#2a24200f 24px) 0 0/24px 24px;
  padding:max(18px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(18px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:flex;justify-content:center;align-items:flex-start}
 #menu.overlay,#result.overlay,#pause.overlay{background-color:#ece3cd;opacity:1;isolation:isolate}
-.room-box{max-width:560px}.room-code-row{display:flex;align-items:center;justify-content:space-between;margin:12px 0;padding:12px;background:#2a2420;color:#f6efdc;border-radius:6px}.room-code-row strong{font:700 24px var(--f-mono);letter-spacing:.16em;color:#e0a526}.room-input,.room-number{box-sizing:border-box;width:100%;padding:10px;margin:5px 0 10px;border:2px solid var(--ink);border-radius:6px;background:#fff8e6;color:var(--ink);font:700 15px var(--f-disp)}.room-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.room-players{margin:10px 0;padding:10px;border:2px solid var(--ink);border-radius:6px;background:#fff8e6;min-height:42px}.room-players div{padding:4px 0;border-bottom:1px solid #2a242040}.room-players div:last-child{border-bottom:0}.room-players .owner{color:var(--red);font-weight:700}#ownerSettings{display:grid;grid-template-columns:1fr 1fr;gap:8px}#ownerSettings label{font-size:12px;font-weight:700}.room-number{margin-top:5px}
+.room-box{max-width:560px}.room-code-row{display:flex;align-items:center;justify-content:space-between;margin:12px 0;padding:12px;background:#2a2420;color:#f6efdc;border-radius:6px}.room-code-row strong{font:700 24px var(--f-mono);letter-spacing:.16em;color:#e0a526}.room-input,.room-number{box-sizing:border-box;width:100%;padding:10px;margin:5px 0 10px;border:2px solid var(--ink);border-radius:6px;background:#fff8e6;color:var(--ink);font:700 15px var(--f-disp)}.room-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.room-players{margin:10px 0;padding:10px;border:2px solid var(--ink);border-radius:6px;background:#fff8e6;min-height:42px}.room-players div{padding:4px 0;border-bottom:1px solid #2a242040}.room-players div:last-child{border-bottom:0}.room-players .owner{color:var(--red);font-weight:700}#ownerSettings{display:grid;grid-template-columns:1fr 1fr;gap:8px}#ownerSettings label{font-size:12px;font-weight:700}#ownerSettings .room-check{display:flex;align-items:center;gap:7px}.room-number{margin-top:5px}
 .privacy-toggle{display:block;margin:2px 0 10px;font-size:13px;font-weight:700}.public-room-head{display:flex;align-items:center;justify-content:space-between;margin-top:14px}.refresh-btn{padding:5px 10px;font-size:12px}.public-room{display:flex;align-items:center;justify-content:space-between;gap:8px}.public-room-info{min-width:0}.public-room-info b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.public-room-info small{color:var(--dim)}.public-room .btn{padding:5px 9px;font-size:12px;flex:none}
 .wrap{width:100%;max-width:860px;margin:auto 0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px}
 .wrap>div{background:rgba(246,239,220,.94);border:2px solid var(--ink);border-radius:10px;padding:clamp(16px,3vw,28px);box-shadow:5px 5px 0 rgba(42,36,32,.9)}
@@ -175,7 +175,7 @@ kbd{font-family:var(--f-mono);font-size:11px;background:#fff8e6;border:1px solid
     <p id="roomStatus" class="lead">サーバーに接続中…</p>
     <div class="room-code-row"><span>部屋コード</span><strong id="roomCode">なし</strong></div>
     <div id="roomPlayers" class="room-players"></div>
-    <div id="ownerSettings" hidden><label>ゲーム時間（秒）<input id="roomTime" class="room-number" type="number" min="30" max="1800" value="180"></label><label>勝利キル数<input id="roomKills" class="room-number" type="number" min="1" max="100" value="10"></label><label>最大人数<input id="roomMax" class="room-number" type="number" min="2" max="32" value="8"></label><label>ボット人数<input id="roomBots" class="room-number" type="number" min="0" max="4" step="1" value="3"></label><label>マップサイズ<select id="roomMapSize" class="room-number"><option value="small">小</option><option value="medium" selected>中</option><option value="large">大</option></select></label></div>
+    <div id="ownerSettings" hidden><label>ゲーム時間（秒）<input id="roomTime" class="room-number" type="number" min="30" max="1800" value="180"></label><label>勝利キル数<input id="roomKills" class="room-number" type="number" min="1" max="100" value="10"></label><label>最大人数<input id="roomMax" class="room-number" type="number" min="2" max="32" value="8"></label><label>ボット人数<input id="roomBots" class="room-number" type="number" min="0" max="4" step="1" value="3"></label><label>マップサイズ<select id="roomMapSize" class="room-number"><option value="small">小</option><option value="medium" selected>中</option><option value="large">大</option></select></label><label class="room-check"><input id="roomAimAssist" type="checkbox" checked> 弓の照準を自動補正</label></div>
     <button class="btn go" id="startRoomBtn" disabled>オーナーがゲーム開始</button>
     <button class="btn ghost" id="leaveRoomBtn">メニューへ戻る</button>
   </div>
@@ -230,7 +230,7 @@ repairUi();
 const angDiff=(a,b)=>{let d=(b-a)%(Math.PI*2);if(d>Math.PI)d-=Math.PI*2;if(d<-Math.PI)d+=Math.PI*2;return d};
 const C={ARROW_V:15,SMALL_SPEED:4.2,GIANT_SPEED:2.8,RELOAD_T:.9,GIANT_MAX:2,LOCKOUT:.8,VIS_SMALL:6.5,VIS_GIANT:11,REVEAL:13,MATCH_T:180,TARGET:10,CRATE_MAX:4,DRAW_T:.45};
 const MAP_SIZES={small:{w:8,h:6,label:'小'},medium:{w:10,h:8,label:'中'},large:{w:13,h:10,label:'大'}};
-let matchRules={time:C.MATCH_T,kills:C.TARGET,mapSize:'medium',bots:3};
+let matchRules={time:C.MATCH_T,kills:C.TARGET,mapSize:'medium',bots:3,aimAssist:true};
 const TYPES={n:{name:'通常矢',icon:'矢',key:'1',max:15,col:'#2a2420'},f:{name:'フラッシュ',icon:'閃',key:'2',max:3,col:'#d48a00'}};
 const TYPE_KEYS=['n','f'];
 const DIFF={easy:{react:.75,err:.2,turn:4.5,spd:.88,scout:12},normal:{react:.4,err:.1,turn:7.5,spd:1,scout:8.5},hard:{react:.2,err:.045,turn:12,spd:1.06,scout:6}};
@@ -811,11 +811,11 @@ function playerTick(p,dt){
   if(mouseLocked){if(inp.mouseTurn){p.ang+=inp.mouseTurn;inp.mouseTurn=0}keyboardAimLocked=true}
   const aim=activeControl()==='touch'?(cfg.touchAimWithMove?null:(inp.touchAim??inp.aim)):inp.aim;
   const drawing=holdFire&&p.alive&&p.loaded[p.sel]&&p.cd<=0;
-  const want=!!(inp.reload||keyDown('reload')||K.KeyK)||(drawing&&p.g>.25);
+  const want=!!(inp.reload||keyDown('reload')||K.KeyK);
   tickBody(p,dt,want&&p.alive);
   if(holdFire&&!p.wasHold&&p.alive&&!p.loaded[p.sel])toast('矢がない','R を押し続けて装填',1000);
   p.wasHold=holdFire;
-  if(drawing){p.draw+=dt;p.snap=aim==null;p.pick=pickAim(p,p.ang,p.snap?.42:.2)}
+  if(drawing){p.draw+=dt;p.snap=aim==null;p.pick=matchRules.aimAssist?pickAim(p,p.ang,p.snap?.42:.2):null}
   else{if(p.draw>0&&!holdFire)releaseShot(p);if(inp.mouseTap&&p.alive)fire(p,p.ang,false);inp.mouseTap=false;p.draw=0;p.pick=null}
   if(aim!=null&&!mouseLocked){p.ang=aim;keyboardAimLocked=true}
   else if(m>.2&&activeControl()==='touch'&&cfg.touchAimWithMove)p.ang=Math.atan2(my,mx);
@@ -900,7 +900,7 @@ function endMatch(remote=false){
   setTimeout(()=>{if(state==='over')$('#result').hidden=false},900);
 }
 function pauseGame(){if(state!=='play')return;if(player)player.inv=0;state='pause';$('#pause').hidden=false;sendNetState(true)}
-function sendNetState(paused=false){if(!net.started||!player)return;netSend('state',{state:{x:player.x,y:player.y,ang:player.ang,g:player.g,alive:player.alive,kills:player.kills,deaths:player.deaths,inv:player.inv,paused}})}
+function sendNetState(paused=false){if(!net.started||!player)return;const peerArrows=arrows.filter(a=>a.owner===player).map(({x,y,vx,vy,spd,lob,t})=>({x,y,vx,vy,spd,lob,t}));netSend('state',{state:{x:player.x,y:player.y,ang:player.ang,g:player.g,alive:player.alive,kills:player.kills,deaths:player.deaths,inv:player.inv,paused,arrows:peerArrows}})}
 function resumeGame(){if(state!=='pause')return;state='play';$('#pause').hidden=true;last=performance.now();sendNetState(false)}
 
 /* ---------- render ---------- */
@@ -990,7 +990,8 @@ function render(dt){
     else if(f.kind==='spark'){ctx.fillStyle=`rgba(255,220,140,${1-k})`;ctx.beginPath();ctx.arc(sx,sy,z*(.1+.3*k),0,6.283);ctx.fill()}
   }
   // arrows
-  for(const a of arrows){
+  const visibleArrows=[...arrows,...ents.filter(e=>e.isRemote).flatMap(e=>e.netArrows||[])];
+  for(const a of visibleArrows){
     if(a.lob)continue;
     const sx=a.x*z+ox,sy=a.y*z+oy,l=.9*z,col=TYPES[a.t].col,ux=a.vx/a.spd,uy=a.vy/a.spd;
     ctx.strokeStyle=col;ctx.lineWidth=Math.max(2,z*.06);ctx.beginPath();ctx.moveTo(sx-ux*l,sy-uy*l);ctx.lineTo(sx,sy);ctx.stroke();
@@ -1047,7 +1048,7 @@ function render(dt){
     ctx.strokeStyle='#ff6a4d';ctx.lineWidth=3;ctx.setLineDash([10,6]);ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(ex,ey);ctx.stroke();ctx.setLineDash([]);
     ctx.font='700 13px sans-serif';ctx.textAlign='center';ctx.lineWidth=4;ctx.strokeStyle='#1c1713';ctx.strokeText('壁越し',(sx+ex)/2,(sy+ey)/2-8);ctx.fillStyle='#ff6a4d';ctx.fillText('壁越し',(sx+ex)/2,(sy+ey)/2-8);
   }
-  for(const a of arrows){
+  for(const a of visibleArrows){
     if(!a.lob||Math.hypot(a.x-p.x,a.y-p.y)>C.VIS_GIANT+2)continue;
     const sx=a.x*z+ox,sy=a.y*z+oy,ux=a.vx/a.spd,uy=a.vy/a.spd;
     ctx.lineCap='round';ctx.strokeStyle='#1c1713';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(sx-ux*1.4*z,sy-uy*1.4*z);ctx.lineTo(sx,sy);ctx.stroke();
@@ -1118,7 +1119,7 @@ function updateRoomView(room){
   net.room=room;$('#roomBrowser').hidden=true;$('#room').hidden=false;$('#roomCode').textContent=room.code||'なし';$('#room .res-h').textContent=room.name||'オンライン部屋';
   $('#roomPlayers').innerHTML=`<div>参加人数：${room.players.length}/${room.maxPlayers}人</div>`+(room.players||[]).map(p=>`<div class="${p.id===room.ownerId?'owner':''}">${p.name}${p.id===room.ownerId?'　★オーナー':''}</div>`).join('')||'<div>参加者を待っています</div>';
   const owner=room.ownerId===net.id;$('#ownerSettings').hidden=!owner;$('#startRoomBtn').disabled=!owner||room.players.length<1;$('#startRoomBtn').textContent=owner?'ゲーム開始':'オーナーがゲーム開始';
-  if(owner){$('#roomTime').value=room.settings.time;$('#roomKills').value=room.settings.kills;$('#roomMax').value=room.maxPlayers;$('#roomBots').value=room.settings.bots??3;$('#roomMapSize').value=room.settings.mapSize||'medium';roomStatus('部屋を作成しました。参加者を待っています')}
+  if(owner){$('#roomTime').value=room.settings.time;$('#roomKills').value=room.settings.kills;$('#roomMax').value=room.maxPlayers;$('#roomBots').value=room.settings.bots??3;$('#roomMapSize').value=room.settings.mapSize||'medium';$('#roomAimAssist').checked=room.settings.aimAssist!==false;roomStatus('部屋を作成しました。参加者を待っています')}
   else roomStatus('オーナーがゲームを開始するまでお待ちください');
 }
 function connectRoomServer(){
@@ -1131,10 +1132,10 @@ function connectRoomServer(){
     if(m.type==='room_list'){renderPublicRooms(m.rooms||[]);return}
     if(m.type==='room_created'||m.type==='room_state')updateRoomView(m.room);
     if(m.type==='error'){roomStatus(m.message);browserStatus(m.message)}
-    if(m.type==='game_start'&&!$('#room').hidden){const bots=m.settings.bots==null?3:Number(m.settings.bots);matchRules={time:m.settings.time,kills:m.settings.kills,mapSize:m.settings.mapSize||'medium',bots:Math.max(0,Math.min(4,Number.isFinite(bots)?bots:3))};net.players=m.players||[];net.started=true;net.ended=false;$('#room').hidden=true;startMatch()}
+    if(m.type==='game_start'&&!$('#room').hidden){const bots=m.settings.bots==null?3:Number(m.settings.bots);matchRules={time:m.settings.time,kills:m.settings.kills,mapSize:m.settings.mapSize||'medium',bots:Math.max(0,Math.min(4,Number.isFinite(bots)?bots:3)),aimAssist:m.settings.aimAssist!==false};net.players=m.players||[];net.started=true;net.ended=false;$('#room').hidden=true;startMatch()}
     if(m.type==='game_end'){net.ended=true;net.started=false;endMatch(true)}
     if(m.type==='map'&&m.grid){grid=Uint8Array.from(m.grid);GW=m.GW;GH=m.GH;floors=[];for(let i=0;i<grid.length;i++)if(!grid[i])floors.push(i)}
-    if(m.type==='peer_state'){const e=ents.find(x=>x.netId===m.id);if(e&&e.isRemote)Object.assign(e,m.state)}
+    if(m.type==='peer_state'){const e=ents.find(x=>x.netId===m.id);if(e&&e.isRemote&&m.state&&typeof m.state==='object'){const {arrows:peerArrows,...peerState}=m.state;Object.assign(e,peerState);e.netArrows=Array.isArray(peerArrows)?peerArrows:[]}}
     if(m.type==='remote_hit'&&player&&player.alive){const attacker=ents.find(x=>x.netId===m.attackerId)||player;if(m.type==='remote_hit'&&m.arrowType==='f')flashAt(player.x,player.y,attacker,player);else kill(player,attacker)}
   };
   net.ws.onerror=()=>roomStatus('サーバーに接続できません。server.jsを起動してください');
@@ -1144,7 +1145,7 @@ function readPlayerName(){try{return localStorage.getItem('gr_name')||''}catch(e
 function savePlayerName(name){try{localStorage.setItem('gr_name',name)}catch(error){if(error?.name!=='SecurityError')throw error}}
 function openRoom(){state='menu';$('#menu').hidden=true;$('#room').hidden=true;$('#roomBrowser').hidden=false;$('#browserName').value=readPlayerName();$('#publicRooms').innerHTML='<div>読み込み中…</div>';connectRoomServer()}
 function startSinglePlayer(){
-  if(net.ws)net.ws.close();net.ws=null;net.room=null;net.players=[];net.started=false;matchRules={time:C.MATCH_T,kills:C.TARGET,mapSize:'medium'};
+  if(net.ws)net.ws.close();net.ws=null;net.room=null;net.players=[];net.started=false;matchRules={time:C.MATCH_T,kills:C.TARGET,mapSize:'medium',aimAssist:true};
   $('#menu').hidden=true;$('#roomBrowser').hidden=true;$('#room').hidden=true;startMatch();
 }
 function joinPublicRoom(id){const name=$('#browserName').value.trim()||'Player';savePlayerName(name);netSend('join_room',{name,roomId:id})}
@@ -1171,8 +1172,8 @@ $('#joinByCodeBtn').addEventListener('click',()=>{const name=$('#browserName').v
 $('#refreshRoomsBtn').addEventListener('click',()=>netSend('list_rooms'));
 $('#leaveBrowserBtn').addEventListener('click',leaveRoom);
 $('#startRoomBtn').addEventListener('click',()=>netSend('start_game'));
-const sendRoomSettings=()=>netSend('set_settings',{time:$('#roomTime').value,kills:$('#roomKills').value,maxPlayers:$('#roomMax').value,bots:$('#roomBots').value,mapSize:$('#roomMapSize').value});
-$('#roomTime').addEventListener('change',sendRoomSettings);$('#roomKills').addEventListener('change',sendRoomSettings);$('#roomMax').addEventListener('change',sendRoomSettings);$('#roomBots').addEventListener('change',sendRoomSettings);$('#roomMapSize').addEventListener('change',sendRoomSettings);
+const sendRoomSettings=()=>netSend('set_settings',{time:$('#roomTime').value,kills:$('#roomKills').value,maxPlayers:$('#roomMax').value,bots:$('#roomBots').value,mapSize:$('#roomMapSize').value,aimAssist:$('#roomAimAssist').checked});
+$('#roomTime').addEventListener('change',sendRoomSettings);$('#roomKills').addEventListener('change',sendRoomSettings);$('#roomMax').addEventListener('change',sendRoomSettings);$('#roomBots').addEventListener('change',sendRoomSettings);$('#roomMapSize').addEventListener('change',sendRoomSettings);$('#roomAimAssist').addEventListener('change',sendRoomSettings);
 $('#leaveRoomBtn').addEventListener('click',leaveRoom);
 $('#againBtn').addEventListener('click',returnToRoom);
 $('#menuBtn').addEventListener('click',()=>{state='menu';$('#result').hidden=true;$('#menu').hidden=false});
