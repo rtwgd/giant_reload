@@ -217,7 +217,7 @@ function repairUi(){
     <div class="forms"><div class="form"><b><i class="sz s"></i>小さい状態</b>壁の裏に隠れられる。弓を構えて狙うのはこの状態。</div>
     <div class="form"><b><i class="sz b"></i>巨大化状態</b>壁越しに敵を発見できる。敵にも見つかるが、弓を持っていれば射撃できる。</div></div></div>
     <div><div class="opt"><label>操作プリセット</label><div class="seg" id="optControl"><button data-v="auto" aria-pressed="true">自動検知</button><button data-v="touch" aria-pressed="false">タッチ</button><button data-v="mouse" aria-pressed="false">マウス</button><button data-v="keyboard" aria-pressed="false">キーボード</button><button data-v="custom" aria-pressed="false">カスタム</button></div></div>
-    <button class="settings-toggle" id="settingsBtn" type="button">⚙ 設定</button><div class="opt settings-panel" id="settingsPanel" hidden><label>操作設定</label><small class="settings-note">プリセットは迷ったときに使えます。移動と照準は個別にも選べます。</small><div class="settings-grid"><div class="setting-row"><label for="moveInput">移動</label><select id="moveInput"><option value="keyboard">キーボード</option><option value="touch">左スティック</option></select></div><div class="setting-row"><label for="aimInput">弓のエイム</label><select id="aimInput"><option value="keyboard">キーボード</option><option value="mouse">マウス</option><option value="touch">右スティック</option></select></div><div class="setting-row"><span>マウス感度</span><input id="mouseSensitivity" type="range" min="0.0015" max="0.0100" step="0.0005" value="0.0045"><output id="sensitivityValue">標準</output></div><div class="setting-row"><span>左スティックで移動と弓操作を兼用</span><input id="touchAimWithMove" type="checkbox" aria-label="左スティックで移動と弓操作を兼用"></div><div class="setting-row"><span>移動 上</span><span class="key-list"><button class="keybind" data-bind="up" data-slot="0"></button><button class="keybind" data-bind="up" data-slot="1"></button><button class="keybind" data-bind="up" data-slot="2"></button></span></div><div class="setting-row"><span>移動 下</span><span class="key-list"><button class="keybind" data-bind="down" data-slot="0"></button><button class="keybind" data-bind="down" data-slot="1"></button><button class="keybind" data-bind="down" data-slot="2"></button></span></div><div class="setting-row"><span>移動 左</span><span class="key-list"><button class="keybind" data-bind="left" data-slot="0"></button><button class="keybind" data-bind="left" data-slot="1"></button><button class="keybind" data-bind="left" data-slot="2"></button></span></div><div class="setting-row"><span>移動 右</span><span class="key-list"><button class="keybind" data-bind="right" data-slot="0"></button><button class="keybind" data-bind="right" data-slot="1"></button><button class="keybind" data-bind="right" data-slot="2"></button></span></div><div class="setting-row"><span>射撃</span><span class="key-list"><button class="keybind" data-bind="fire" data-slot="0"></button><button class="keybind" data-bind="fire" data-slot="1"></button><button class="keybind" data-bind="fire" data-slot="2"></button></span></div><div class="setting-row"><span>リロード</span><span class="key-list"><button class="keybind" data-bind="reload" data-slot="0"></button><button class="keybind" data-bind="reload" data-slot="1"></button><button class="keybind" data-bind="reload" data-slot="2"></button></span></div><div class="setting-row"><span>通常弓選択</span><span class="key-list"><button class="keybind" data-bind="weaponN" data-slot="0"></button><button class="keybind" data-bind="weaponN" data-slot="1"></button><button class="keybind" data-bind="weaponN" data-slot="2"></button></span></div><div class="setting-row"><span>閃光弓選択</span><span class="key-list"><button class="keybind" data-bind="weaponF" data-slot="0"></button><button class="keybind" data-bind="weaponF" data-slot="1"></button><button class="keybind" data-bind="weaponF" data-slot="2"></button></span></div><div class="setting-row"><span>デコイ</span><span class="key-list"><button class="keybind" data-bind="decoy" data-slot="0"></button><button class="keybind" data-bind="decoy" data-slot="1"></button><button class="keybind" data-bind="decoy" data-slot="2"></button></span></div></div></div>
+    <button class="settings-toggle" id="settingsBtn" type="button">⚙ 設定</button><div class="opt settings-panel" id="settingsPanel" hidden><label>操作設定</label><small class="settings-note">移動・照準・射撃・リロードの操作を個別に選べます。</small><div class="settings-grid"><div class="setting-row"><label for="moveInput">移動</label><select id="moveInput"><option value="keyboard">キーボード</option><option value="touch">左スティック</option></select></div><div class="setting-row"><label for="aimInput">弓のエイム</label><select id="aimInput"><option value="keyboard">キーボード</option><option value="mouse">マウス</option><option value="touch">右スティック</option></select></div><div class="setting-row"><label for="fireInput">射撃</label><select id="fireInput"><option value="button">画面ボタン</option><option value="keyboard">キーボード</option></select></div><div class="setting-row"><label for="reloadInput">リロード</label><select id="reloadInput"><option value="button">画面ボタン</option><option value="keyboard">キーボード</option></select></div><div class="setting-row"><span>マウス感度</span><input id="mouseSensitivity" type="range" min="0.0015" max="0.0100" step="0.0005" value="0.0045"><output id="sensitivityValue">標準</output></div><div class="setting-row"><span>左スティックで移動と弓操作を兼用</span><input id="touchAimWithMove" type="checkbox" aria-label="左スティックで移動と弓操作を兼用"></div><div class="setting-row"><span>移動 上</span><span class="key-list"><button class="keybind" data-bind="up" data-slot="0"></button><button class="keybind" data-bind="up" data-slot="1"></button><button class="keybind" data-bind="up" data-slot="2"></button></span></div><div class="setting-row"><span>移動 下</span><span class="key-list"><button class="keybind" data-bind="down" data-slot="0"></button><button class="keybind" data-bind="down" data-slot="1"></button><button class="keybind" data-bind="down" data-slot="2"></button></span></div><div class="setting-row"><span>移動 左</span><span class="key-list"><button class="keybind" data-bind="left" data-slot="0"></button><button class="keybind" data-bind="left" data-slot="1"></button><button class="keybind" data-bind="left" data-slot="2"></button></span></div><div class="setting-row"><span>移動 右</span><span class="key-list"><button class="keybind" data-bind="right" data-slot="0"></button><button class="keybind" data-bind="right" data-slot="1"></button><button class="keybind" data-bind="right" data-slot="2"></button></span></div><div class="setting-row"><span>射撃</span><span class="key-list"><button class="keybind" data-bind="fire" data-slot="0"></button><button class="keybind" data-bind="fire" data-slot="1"></button><button class="keybind" data-bind="fire" data-slot="2"></button></span></div><div class="setting-row"><span>リロード</span><span class="key-list"><button class="keybind" data-bind="reload" data-slot="0"></button><button class="keybind" data-bind="reload" data-slot="1"></button><button class="keybind" data-bind="reload" data-slot="2"></button></span></div><div class="setting-row"><span>通常弓選択</span><span class="key-list"><button class="keybind" data-bind="weaponN" data-slot="0"></button><button class="keybind" data-bind="weaponN" data-slot="1"></button><button class="keybind" data-bind="weaponN" data-slot="2"></button></span></div><div class="setting-row"><span>閃光弓選択</span><span class="key-list"><button class="keybind" data-bind="weaponF" data-slot="0"></button><button class="keybind" data-bind="weaponF" data-slot="1"></button><button class="keybind" data-bind="weaponF" data-slot="2"></button></span></div><div class="setting-row"><span>デコイ</span><span class="key-list"><button class="keybind" data-bind="decoy" data-slot="0"></button><button class="keybind" data-bind="decoy" data-slot="1"></button><button class="keybind" data-bind="decoy" data-slot="2"></button></span></div></div></div>
     <div class="opt"><label>CPUの強さ</label><div class="seg" id="optDiff"><button data-v="easy" aria-pressed="false">やさしい</button><button data-v="normal" aria-pressed="true">ふつう</button><button data-v="hard" aria-pressed="false">むずかしい</button></div></div>
     <div class="opt"><label>CPUの人数</label><div class="seg" id="optBots"><button data-v="0" aria-pressed="false">0人</button><button data-v="1" aria-pressed="false">1人</button><button data-v="2" aria-pressed="false">2人</button><button data-v="3" aria-pressed="true">3人</button><button data-v="4" aria-pressed="false">4人</button></div></div>
     <button class="btn go" id="startBtn">オンライン部屋へ</button><button class="btn" id="singleBtn">シングルプレイ</button><button class="btn ghost fsb" id="fsBtn2">全画面にする</button>
@@ -238,7 +238,7 @@ let matchRules={time:C.MATCH_T,kills:C.TARGET,mapSize:'medium',bots:3,aimAssist:
 const TYPES={n:{name:'通常矢',icon:'矢',key:'1',max:15,col:'#2a2420'},f:{name:'フラッシュ',icon:'閃',key:'2',max:3,col:'#d48a00'}};
 const TYPE_KEYS=['n','f'];
 const DIFF={easy:{react:.75,err:.2,turn:4.5,spd:.88,scout:12},normal:{react:.4,err:.1,turn:7.5,spd:1,scout:8.5},hard:{react:.2,err:.045,turn:12,spd:1.06,scout:6}};
-const cfg={diff:'normal',bots:3,control:'touch',moveInput:'touch',aimInput:'touch',touchAimWithMove:false,mouseSensitivity:.0045,keys:{up:['KeyW'],down:['KeyS'],left:['KeyA'],right:['KeyD'],fire:['Space'],reload:['KeyR'],weaponN:['Digit1'],weaponF:['Digit2']}};
+const cfg={diff:'normal',bots:3,control:'touch',moveInput:'touch',aimInput:'touch',fireInput:'button',reloadInput:'button',touchAimWithMove:false,mouseSensitivity:.0045,keys:{up:['KeyW'],down:['KeyS'],left:['KeyA'],right:['KeyD'],fire:['Space'],reload:['KeyR'],weaponN:['Digit1'],weaponF:['Digit2']}};
 const SETTINGS_KEY='gr_settings';
 function readPreferences(){
   let raw;
@@ -261,8 +261,13 @@ function restorePreferences(){
   const preset=cfg.control==='auto'?(window.matchMedia&&matchMedia('(pointer: coarse)').matches?'touch':'mouse'):cfg.control;
   if(!Object.hasOwn(saved,'moveInput'))cfg.moveInput=preset==='touch'?'touch':'keyboard';
   if(!Object.hasOwn(saved,'aimInput'))cfg.aimInput=preset==='touch'?'touch':preset==='mouse'?'mouse':'keyboard';
+  const buttonControls=preset==='touch'||cfg.moveInput==='touch'||cfg.aimInput==='touch';
+  if(!Object.hasOwn(saved,'fireInput'))cfg.fireInput=buttonControls?'button':'keyboard';
+  if(!Object.hasOwn(saved,'reloadInput'))cfg.reloadInput=buttonControls?'button':'keyboard';
   if(Object.hasOwn(saved,'moveInput')){if(['touch','keyboard'].includes(saved.moveInput))cfg.moveInput=saved.moveInput;else console.warn('Ignoring invalid saved movement input.')}
   if(Object.hasOwn(saved,'aimInput')){if(['touch','mouse','keyboard'].includes(saved.aimInput))cfg.aimInput=saved.aimInput;else console.warn('Ignoring invalid saved aim input.')}
+  if(Object.hasOwn(saved,'fireInput')){if(['button','keyboard'].includes(saved.fireInput))cfg.fireInput=saved.fireInput;else console.warn('Ignoring invalid saved fire input.')}
+  if(Object.hasOwn(saved,'reloadInput')){if(['button','keyboard'].includes(saved.reloadInput))cfg.reloadInput=saved.reloadInput;else console.warn('Ignoring invalid saved reload input.')}
   if(Object.hasOwn(saved,'touchAimWithMove')){if(typeof saved.touchAimWithMove==='boolean')cfg.touchAimWithMove=saved.touchAimWithMove;else console.warn('Ignoring invalid saved touch aim setting.')}
   if(Object.hasOwn(saved,'mouseSensitivity')){if(Number.isFinite(saved.mouseSensitivity)&&saved.mouseSensitivity>=.0015&&saved.mouseSensitivity<=.01)cfg.mouseSensitivity=saved.mouseSensitivity;else console.warn('Ignoring invalid saved mouse sensitivity.')}
   if(Object.hasOwn(saved,'keys')){
@@ -287,7 +292,7 @@ function updateSettingsUI(){
   document.querySelectorAll('.keybind').forEach(b=>{const a=b.dataset.bind,s=Number(b.dataset.slot);b.textContent=rebinding&&rebinding.action===a&&rebinding.slot===s?'キーを入力':keyLabel((cfg.keys[a]||[])[s]||'未設定')});
   const s=$('#mouseSensitivity'),o=$('#sensitivityValue');if(s&&o){s.value=cfg.mouseSensitivity;o.textContent=cfg.mouseSensitivity<.0035?'低':cfg.mouseSensitivity>.006?'高':'標準'}
   const touchAim=$('#touchAimWithMove');if(touchAim)touchAim.checked=cfg.touchAimWithMove;
-  const move=$('#moveInput'),aim=$('#aimInput');if(move)move.value=cfg.moveInput;if(aim)aim.value=cfg.aimInput;
+  const move=$('#moveInput'),aim=$('#aimInput'),fire=$('#fireInput'),reload=$('#reloadInput');if(move)move.value=cfg.moveInput;if(aim)aim.value=cfg.aimInput;if(fire)fire.value=cfg.fireInput;if(reload)reload.value=cfg.reloadInput;
 }
 function updateControlPresetUI(){
   const box=$('#optControl');if(!box)return;
@@ -299,7 +304,7 @@ function bindSettings(){
   document.querySelectorAll('.keybind').forEach(b=>b.addEventListener('click',()=>{rebinding={action:b.dataset.bind,slot:Number(b.dataset.slot)};updateSettingsUI()}));
   $('#mouseSensitivity').addEventListener('input',e=>{cfg.mouseSensitivity=Number(e.target.value);updateSettingsUI();savePreferences()});
   $('#touchAimWithMove').addEventListener('change',e=>{cfg.touchAimWithMove=e.target.checked;applyControlMode();savePreferences()});
-  for(const [id,key] of [['moveInput','moveInput'],['aimInput','aimInput']]){
+  for(const [id,key] of [['moveInput','moveInput'],['aimInput','aimInput'],['fireInput','fireInput'],['reloadInput','reloadInput']]){
     $(`#${id}`).addEventListener('change',e=>{cfg[key]=e.target.value;cfg.control='custom';applyControlMode();updateControlPresetUI();savePreferences()});
   }
   $('#settingsBtn').addEventListener('click',()=>{$('#settingsPanel').hidden=!$('#settingsPanel').hidden});
@@ -327,7 +332,8 @@ function aimInput(){
 }
 function applyControlMode(){
   const moveTouch=movementInput()==='touch',aimTouch=aimInput()==='touch';
-  const hasTouchControls=moveTouch||aimTouch;
+  const hasFireButton=cfg.fireInput==='button',hasReloadButton=cfg.reloadInput==='button';
+  const hasTouchControls=moveTouch||aimTouch||hasFireButton||hasReloadButton;
   const aimWithMove=cfg.touchAimWithMove&&moveTouch&&aimTouch;
   document.body.classList.toggle('touch',hasTouchControls);
   document.body.classList.toggle('move-touch',moveTouch);
@@ -335,8 +341,8 @@ function applyControlMode(){
   $('#touch').hidden=!hasTouchControls;
   $('#stick').hidden=!moveTouch;
   $('#aimStick').hidden=!aimTouch||aimWithMove;
-  $('#fireBtn').hidden=!hasTouchControls;
-  $('#reloadBtn').hidden=!hasTouchControls;
+  $('#fireBtn').hidden=!hasFireButton;
+  $('#reloadBtn').hidden=!hasReloadButton;
 }
 applyControlMode();
 function resize(){
@@ -615,7 +621,7 @@ window.addEventListener('blur',()=>{for(const k in K)K[k]=false;if(state==='play
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&state==='play')pauseGame()});
 
 /* touch controls */
-function enableTouch(){if(cfg.control==='auto'){autoTouchDetected=true;cfg.moveInput='touch';cfg.aimInput='touch';updateSettingsUI();applyControlMode()}}
+function enableTouch(){if(cfg.control==='auto'){autoTouchDetected=true;cfg.moveInput='touch';cfg.aimInput='touch';cfg.fireInput='button';cfg.reloadInput='button';updateSettingsUI();applyControlMode()}}
 window.addEventListener('touchstart',enableTouch,{once:true,passive:true});
 (function bindTouch(){
   const stick=$('#stick'),knob=$('#knob');let sp=null;
@@ -675,7 +681,7 @@ window.addEventListener('touchstart',enableTouch,{once:true,passive:true});
     if(document.pointerLockElement!==cv){try{const r=cv.requestPointerLock();if(r&&r.catch)r.catch(()=>{})}catch(err){}}
   };
   const finishMouseButton=e=>{
-    if(e.button===0){leftDown=false;inp.fireHeld=false;inp.mouseTap=true}
+    if(e.button===0){leftDown=false;inp.fireHeld=false;if(cfg.fireInput==='button')inp.mouseTap=true}
     if(e.button===2){rightDown=false;inp.reload=false}
     if(!leftDown&&!rightDown){active=false;inp.aim=null}
   };
@@ -698,7 +704,7 @@ window.addEventListener('touchstart',enableTouch,{once:true,passive:true});
   cv.addEventListener('contextmenu',e=>{if(state==='play')e.preventDefault()});
   const end=e=>{
     if(e.pointerType!=='mouse')return;
-    if(e.button===0){leftDown=false;inp.fireHeld=false;inp.mouseTap=true}
+    if(e.button===0){leftDown=false;inp.fireHeld=false;if(cfg.fireInput==='button')inp.mouseTap=true}
     if(e.button===2){rightDown=false;inp.reload=false}
     if(!leftDown&&!rightDown){active=false;inp.aim=null}
   };
@@ -852,7 +858,7 @@ function playerTick(p,dt){
     mx=(keyDown('right')||K.ArrowRight?1:0)-(keyDown('left')||K.ArrowLeft?1:0);my=(keyDown('down')||K.ArrowDown?1:0)-(keyDown('up')||K.ArrowUp?1:0);
   }
   const m=Math.hypot(mx,my);if(m>1){mx/=m;my/=m}
-  const holdFire=!!(inp.fireHeld||keyDown('fire')||K.KeyJ);
+  const holdFire=cfg.fireInput==='button'?inp.fireHeld:(keyDown('fire')||K.KeyJ);
   const keyboardAim=aimInput()==='keyboard';
   const rotate=keyboardAim?((K.KeyZ?-1:0)+(K.KeyX?1:0)):0;
   if(rotate){p.ang+=rotate*3.6*dt;keyboardAimLocked=true}
@@ -861,7 +867,7 @@ function playerTick(p,dt){
   const aimSource=aimInput();
   const aim=aimSource==='touch'?(cfg.touchAimWithMove&&movementInput()==='touch'?null:(inp.stickAim??inp.touchAim)):aimSource==='mouse'?inp.aim:null;
   const drawing=holdFire&&p.alive&&p.loaded[p.sel]&&p.cd<=0;
-  const want=!!(inp.reload||keyDown('reload')||K.KeyK);
+  const want=cfg.reloadInput==='button'?inp.reload:(keyDown('reload')||K.KeyK);
   tickBody(p,dt,want&&p.alive);
   if(holdFire&&!p.wasHold&&p.alive&&!p.loaded[p.sel])toast('矢がない','R を押し続けて装填',1000);
   p.wasHold=holdFire;
@@ -1217,6 +1223,8 @@ function seg(id,key,conv){
         const preset=value==='auto'?activeControl():value;
         cfg.moveInput=preset==='touch'?'touch':'keyboard';
         cfg.aimInput=preset==='touch'?'touch':preset==='mouse'?'mouse':'keyboard';
+        cfg.fireInput=preset==='touch'?'button':'keyboard';
+        cfg.reloadInput=preset==='touch'?'button':'keyboard';
       }
       updateControlPresetUI();updateSettingsUI();applyControlMode();
     }else{
