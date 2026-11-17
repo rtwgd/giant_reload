@@ -46,6 +46,9 @@ body.mouse-locked,body.mouse-locked *{cursor:none!important}
 #touch{display:none}body.touch #touch{display:block}body.touch .slot .ky{display:none}
 #stick{position:absolute;left:var(--gl);bottom:var(--gb);width:150px;height:150px;border-radius:50%;pointer-events:auto;touch-action:none;background:rgba(236,227,205,.07);border:2px dashed rgba(236,227,205,.5)}
 #knob{position:absolute;left:50%;top:50%;width:60px;height:60px;margin:-30px 0 0 -30px;border-radius:50%;background:var(--paper);border:2px solid var(--ink);opacity:.8}
+#aimStick{position:absolute;right:var(--gr);bottom:calc(var(--gb) + 224px);width:150px;height:150px;border-radius:50%;pointer-events:auto;touch-action:none;background:rgba(236,227,205,.07);border:2px dashed rgba(236,227,205,.5)}
+#aimKnob{position:absolute;left:50%;top:50%;width:60px;height:60px;margin:-30px 0 0 -30px;border-radius:50%;background:var(--blue);border:2px solid var(--ink);opacity:.8}
+body.touch-shared-aim #aimStick{display:none}
 #fireBtn,#reloadBtn{position:absolute;right:var(--gr);border-radius:50%;pointer-events:auto;touch-action:none;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:700;line-height:1.2;color:#fff;border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink)}
 #fireBtn{bottom:var(--gb);width:104px;height:104px;background:var(--red);font-size:18px}
 #reloadBtn{bottom:calc(var(--gb) + 118px);width:84px;height:84px;background:var(--blue);font-size:14px}
@@ -55,6 +58,7 @@ body.mouse-locked,body.mouse-locked *{cursor:none!important}
 @media (orientation:portrait){body.touch #dock{bottom:calc(var(--gb) + 216px)}}
 @media (orientation:landscape) and (max-height:520px){
  #stick{width:124px;height:124px}#knob{width:50px;height:50px;margin:-25px 0 0 -25px}
+ #aimStick{width:124px;height:124px;bottom:calc(var(--gb) + 212px)}#aimKnob{width:50px;height:50px;margin:-25px 0 0 -25px}
  #fireBtn{width:92px;height:92px}#reloadBtn{width:78px;height:78px;bottom:calc(var(--gb) + 4px);right:calc(var(--gr) + 106px)}
  .slot{width:46px;height:48px}.slot .ic{font-size:17px}#chip{font-size:11px}#dock{gap:5px}
  #score{font-size:11px;min-width:112px;padding:4px 8px}#feed{display:none}#timer{font-size:16px}#banner{top:18%;font-size:20px}}
@@ -79,7 +83,7 @@ h1 span{background:linear-gradient(transparent 62%,#e0a526 62% 92%,transparent 9
 .seg{display:flex;gap:6px;flex-wrap:wrap}
 .seg button,.btn{font-family:var(--f-disp);font-weight:700;font-size:14px;color:var(--ink);background:#f6efdc;border:2px solid var(--ink);border-radius:6px;padding:8px 14px;cursor:pointer;box-shadow:2px 2px 0 var(--ink)}
 .seg button[aria-pressed="true"]{background:var(--yel)}
-.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0 14px}.setting-row{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px}.setting-row input[type=range]{width:120px;accent-color:var(--red)}.keybind{min-width:76px;padding:5px 8px!important;font-size:12px!important;font-family:var(--f-disp);font-weight:700;color:var(--ink);background:#f6efdc;border:2px solid var(--ink);border-radius:6px;cursor:pointer}
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0 14px}.setting-row{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px}.setting-row input[type=range]{width:120px;accent-color:var(--red)}.setting-row input[type=checkbox]{accent-color:var(--red)}.keybind{min-width:76px;padding:5px 8px!important;font-size:12px!important;font-family:var(--f-disp);font-weight:700;color:var(--ink);background:#f6efdc;border:2px solid var(--ink);border-radius:6px;cursor:pointer}
 .settings-toggle{display:block;margin:0 0 12px;padding:8px 14px;font-family:var(--f-disp);font-size:14px;font-weight:700;color:var(--ink);background:#e0a526;border:2px solid var(--ink);border-radius:6px;box-shadow:2px 2px 0 var(--ink);cursor:pointer}.settings-panel{padding:10px!important}.key-list{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}.key-list .keybind{min-width:52px;padding:4px 5px!important}
 @media (max-width:520px){.settings-grid{grid-template-columns:1fr}.setting-row input[type=range]{width:160px}}
 .btn.go{display:block;width:100%;margin-top:6px;padding:13px;font-size:20px;color:#fff;background:var(--red);box-shadow:3px 3px 0 var(--ink)}
@@ -108,6 +112,7 @@ kbd{font-family:var(--f-mono);font-size:11px;background:#fff8e6;border:1px solid
   </div>
   <div id="touch">
     <div id="stick"><div id="knob"></div></div>
+    <div id="aimStick"><div id="aimKnob"></div></div>
     <div id="reloadBtn">リロード<small>長押し＝巨大化</small></div>
     <div id="fireBtn"><div>引く<small>離して発射</small></div></div>
   </div>
@@ -137,7 +142,7 @@ kbd{font-family:var(--f-mono);font-size:11px;background:#fff8e6;border:1px solid
         <tr><td>矢の切替</td><td><kbd>1</kbd>通常 <kbd>2</kbd>フラッシュ　<kbd>Q</kbd><kbd>E</kbd>でも切替</td></tr>
         <tr><td>壁越し</td><td>巨大化中の敵は壁の向こうにも当たる。狙うと赤い線が出て<b>壁越し射撃</b>になる（巨大化していない敵には当たらない）</td></tr>
         <tr><td>デコイ</td><td><kbd>3</kbd>（2回）</td></tr>
-        <tr><td>スマホ</td><td>左の丸で移動と弓の向きを操作。赤いボタンを押し続けて引き、離すと発射。青いボタンを押し続けてリロード</td></tr>
+        <tr><td>スマホ</td><td>左の丸で移動、右の丸で弓の向きを操作。設定で左の丸にまとめることもできます。赤いボタンを押し続けて引き、離すと発射。青いボタンを押し続けてリロード</td></tr>
         <tr><td>その他</td><td><kbd>F</kbd>全画面　<kbd>P</kbd>一時停止　<kbd>M</kbd>音</td></tr>
       </table></div>
     </div>
@@ -204,7 +209,7 @@ function repairUi(){
     <div class="forms"><div class="form"><b><i class="sz s"></i>小さい状態</b>壁の裏に隠れられる。弓を構えて狙うのはこの状態。</div>
     <div class="form"><b><i class="sz b"></i>巨大化状態</b>壁越しに敵を発見できる。敵にも見つかるが、弓を持っていれば射撃できる。</div></div></div>
     <div><div class="opt"><label>操作方法</label><div class="seg" id="optControl"><button data-v="auto" aria-pressed="true">自動検知</button><button data-v="touch" aria-pressed="false">タッチ</button><button data-v="mouse" aria-pressed="false">マウス</button><button data-v="keyboard" aria-pressed="false">キーボード</button></div></div>
-    <button class="settings-toggle" id="settingsBtn" type="button">⚙ 設定</button><div class="opt settings-panel" id="settingsPanel" hidden><label>操作設定</label><div class="settings-grid"><div class="setting-row"><span>マウス感度</span><input id="mouseSensitivity" type="range" min="0.0015" max="0.0100" step="0.0005" value="0.0045"><output id="sensitivityValue">標準</output></div><div class="setting-row"><span>移動 上</span><span class="key-list"><button class="keybind" data-bind="up" data-slot="0"></button><button class="keybind" data-bind="up" data-slot="1"></button><button class="keybind" data-bind="up" data-slot="2"></button></span></div><div class="setting-row"><span>移動 下</span><span class="key-list"><button class="keybind" data-bind="down" data-slot="0"></button><button class="keybind" data-bind="down" data-slot="1"></button><button class="keybind" data-bind="down" data-slot="2"></button></span></div><div class="setting-row"><span>移動 左</span><span class="key-list"><button class="keybind" data-bind="left" data-slot="0"></button><button class="keybind" data-bind="left" data-slot="1"></button><button class="keybind" data-bind="left" data-slot="2"></button></span></div><div class="setting-row"><span>移動 右</span><span class="key-list"><button class="keybind" data-bind="right" data-slot="0"></button><button class="keybind" data-bind="right" data-slot="1"></button><button class="keybind" data-bind="right" data-slot="2"></button></span></div><div class="setting-row"><span>射撃</span><span class="key-list"><button class="keybind" data-bind="fire" data-slot="0"></button><button class="keybind" data-bind="fire" data-slot="1"></button><button class="keybind" data-bind="fire" data-slot="2"></button></span></div><div class="setting-row"><span>リロード</span><span class="key-list"><button class="keybind" data-bind="reload" data-slot="0"></button><button class="keybind" data-bind="reload" data-slot="1"></button><button class="keybind" data-bind="reload" data-slot="2"></button></span></div><div class="setting-row"><span>通常弓選択</span><span class="key-list"><button class="keybind" data-bind="weaponN" data-slot="0"></button><button class="keybind" data-bind="weaponN" data-slot="1"></button><button class="keybind" data-bind="weaponN" data-slot="2"></button></span></div><div class="setting-row"><span>閃光弓選択</span><span class="key-list"><button class="keybind" data-bind="weaponF" data-slot="0"></button><button class="keybind" data-bind="weaponF" data-slot="1"></button><button class="keybind" data-bind="weaponF" data-slot="2"></button></span></div><div class="setting-row"><span>デコイ</span><span class="key-list"><button class="keybind" data-bind="decoy" data-slot="0"></button><button class="keybind" data-bind="decoy" data-slot="1"></button><button class="keybind" data-bind="decoy" data-slot="2"></button></span></div></div></div>
+    <button class="settings-toggle" id="settingsBtn" type="button">⚙ 設定</button><div class="opt settings-panel" id="settingsPanel" hidden><label>操作設定</label><div class="settings-grid"><div class="setting-row"><span>マウス感度</span><input id="mouseSensitivity" type="range" min="0.0015" max="0.0100" step="0.0005" value="0.0045"><output id="sensitivityValue">標準</output></div><div class="setting-row"><span>左スティックで移動と弓操作を兼用</span><input id="touchAimWithMove" type="checkbox" aria-label="左スティックで移動と弓操作を兼用"></div><div class="setting-row"><span>移動 上</span><span class="key-list"><button class="keybind" data-bind="up" data-slot="0"></button><button class="keybind" data-bind="up" data-slot="1"></button><button class="keybind" data-bind="up" data-slot="2"></button></span></div><div class="setting-row"><span>移動 下</span><span class="key-list"><button class="keybind" data-bind="down" data-slot="0"></button><button class="keybind" data-bind="down" data-slot="1"></button><button class="keybind" data-bind="down" data-slot="2"></button></span></div><div class="setting-row"><span>移動 左</span><span class="key-list"><button class="keybind" data-bind="left" data-slot="0"></button><button class="keybind" data-bind="left" data-slot="1"></button><button class="keybind" data-bind="left" data-slot="2"></button></span></div><div class="setting-row"><span>移動 右</span><span class="key-list"><button class="keybind" data-bind="right" data-slot="0"></button><button class="keybind" data-bind="right" data-slot="1"></button><button class="keybind" data-bind="right" data-slot="2"></button></span></div><div class="setting-row"><span>射撃</span><span class="key-list"><button class="keybind" data-bind="fire" data-slot="0"></button><button class="keybind" data-bind="fire" data-slot="1"></button><button class="keybind" data-bind="fire" data-slot="2"></button></span></div><div class="setting-row"><span>リロード</span><span class="key-list"><button class="keybind" data-bind="reload" data-slot="0"></button><button class="keybind" data-bind="reload" data-slot="1"></button><button class="keybind" data-bind="reload" data-slot="2"></button></span></div><div class="setting-row"><span>通常弓選択</span><span class="key-list"><button class="keybind" data-bind="weaponN" data-slot="0"></button><button class="keybind" data-bind="weaponN" data-slot="1"></button><button class="keybind" data-bind="weaponN" data-slot="2"></button></span></div><div class="setting-row"><span>閃光弓選択</span><span class="key-list"><button class="keybind" data-bind="weaponF" data-slot="0"></button><button class="keybind" data-bind="weaponF" data-slot="1"></button><button class="keybind" data-bind="weaponF" data-slot="2"></button></span></div><div class="setting-row"><span>デコイ</span><span class="key-list"><button class="keybind" data-bind="decoy" data-slot="0"></button><button class="keybind" data-bind="decoy" data-slot="1"></button><button class="keybind" data-bind="decoy" data-slot="2"></button></span></div></div></div>
     <div class="opt"><label>CPUの強さ</label><div class="seg" id="optDiff"><button data-v="easy" aria-pressed="false">やさしい</button><button data-v="normal" aria-pressed="true">ふつう</button><button data-v="hard" aria-pressed="false">むずかしい</button></div></div>
     <div class="opt"><label>CPUの人数</label><div class="seg" id="optBots"><button data-v="0" aria-pressed="false">0人</button><button data-v="1" aria-pressed="false">1人</button><button data-v="2" aria-pressed="false">2人</button><button data-v="3" aria-pressed="true">3人</button><button data-v="4" aria-pressed="false">4人</button></div></div>
     <button class="btn go" id="startBtn">オンライン部屋へ</button><button class="btn" id="singleBtn">シングルプレイ</button><button class="btn ghost fsb" id="fsBtn2">全画面にする</button>
@@ -212,7 +217,7 @@ function repairUi(){
     <tr><td>射撃</td><td><kbd>Space</kbd> / <kbd>J</kbd> を長押しして離す。マウスは左クリック。<kbd>Z</kbd> / <kbd>X</kbd> で照準を連続回転。</td></tr>
     <tr><td>リロード</td><td><kbd>R</kbd> / <kbd>K</kbd> を長押し。マウスは右クリック。現在選択中の弓だけをリロードします。</td></tr>
     <tr><td>武器切替</td><td><kbd>1</kbd> 通常弓、<kbd>2</kbd> フラッシュ、<kbd>Q</kbd><kbd>E</kbd> で切替。</td></tr>
-    <tr><td>タッチ操作</td><td>左スティックの向きに移動し、弓も同じ向きに向きます。右の射撃ボタンは引いて離すと発射。</td></tr>
+    <tr><td>タッチ操作</td><td>左スティックで移動、右スティックで弓を操作。設定で左スティック兼用にもできます。右の射撃ボタンは引いて離すと発射。</td></tr>
     <tr><td>その他</td><td><kbd>F</kbd> 全画面、<kbd>P</kbd> 一時停止、<kbd>M</kbd> ミュート。</td></tr></table></div></div>`;
   $('#pause .res-box h2').textContent='一時停止'; $('#resumeBtn').textContent='再開'; $('#quitBtn').textContent='メニューへ';
   $('#againBtn').textContent='もう一度'; $('#menuBtn').textContent='メニューへ';
@@ -225,7 +230,7 @@ let matchRules={time:C.MATCH_T,kills:C.TARGET,mapSize:'medium',bots:3};
 const TYPES={n:{name:'通常矢',icon:'矢',key:'1',max:15,col:'#2a2420'},f:{name:'フラッシュ',icon:'閃',key:'2',max:3,col:'#d48a00'}};
 const TYPE_KEYS=['n','f'];
 const DIFF={easy:{react:.75,err:.2,turn:4.5,spd:.88,scout:12},normal:{react:.4,err:.1,turn:7.5,spd:1,scout:8.5},hard:{react:.2,err:.045,turn:12,spd:1.06,scout:6}};
-const cfg={diff:'normal',bots:3,control:'auto',mouseSensitivity:.0045,keys:{up:['KeyW'],down:['KeyS'],left:['KeyA'],right:['KeyD'],fire:['Space'],reload:['KeyR'],weaponN:['Digit1'],weaponF:['Digit2']}};
+const cfg={diff:'normal',bots:3,control:'auto',touchAimWithMove:false,mouseSensitivity:.0045,keys:{up:['KeyW'],down:['KeyS'],left:['KeyA'],right:['KeyD'],fire:['Space'],reload:['KeyR'],weaponN:['Digit1'],weaponF:['Digit2']}};
 let rebinding=null;
 const keyNames={Space:'Space',KeyW:'W',KeyA:'A',KeyS:'S',KeyD:'D',KeyR:'R'};
 const keyLabel=k=>keyNames[k]||k.replace(/^Key/,'').replace(/^Digit/,'数字 ');
@@ -239,6 +244,7 @@ function bindSettings(){
   updateSettingsUI();
   document.querySelectorAll('.keybind').forEach(b=>b.addEventListener('click',()=>{rebinding={action:b.dataset.bind,slot:Number(b.dataset.slot)};updateSettingsUI()}));
   $('#mouseSensitivity').addEventListener('input',e=>{cfg.mouseSensitivity=Number(e.target.value);updateSettingsUI()});
+  $('#touchAimWithMove').addEventListener('change',e=>{cfg.touchAimWithMove=e.target.checked;applyControlMode()});
   $('#settingsBtn').addEventListener('click',()=>{$('#settingsPanel').hidden=!$('#settingsPanel').hidden});
 }
 bindSettings();
@@ -253,7 +259,11 @@ function activeControl(){
   if(cfg.control!=='auto')return cfg.control;
   return window.matchMedia&&matchMedia('(pointer: coarse)').matches?'touch':'mouse';
 }
-function applyControlMode(){document.body.classList.toggle('touch',activeControl()==='touch')}
+function applyControlMode(){
+  const isTouch=activeControl()==='touch';
+  document.body.classList.toggle('touch',isTouch);
+  document.body.classList.toggle('touch-shared-aim',isTouch&&cfg.touchAimWithMove);
+}
 applyControlMode();
 function resize(){
   DPR=Math.min(window.devicePixelRatio||1,2); W=Math.max(1,window.innerWidth); H=Math.max(1,window.innerHeight);
@@ -483,7 +493,7 @@ function useDecoy(e){
 }
 
 /* ---------- input ---------- */
-const K={}, inp={sx:0,sy:0,reload:false,aim:null,fireHeld:false,mouseTap:false,mouseTurn:0};
+const K={}, inp={sx:0,sy:0,reload:false,aim:null,touchAim:null,fireHeld:false,mouseTap:false,mouseTurn:0};
 let keyboardAimLocked=false;
 const mvKeys={KeyW:'u',ArrowUp:'u',KeyS:'d',ArrowDown:'d',KeyA:'l',ArrowLeft:'l',KeyD:'r',ArrowRight:'r'};
 function selectType(t){if(player&&TYPES[t]&&player.sel!==t){player.sel=t;player.rl=0}}
@@ -545,6 +555,18 @@ window.addEventListener('touchstart',enableTouch,{once:true,passive:true});
   stick.addEventListener('pointermove',e=>{if(e.pointerId===sp)setStick(e)});
   const endS=e=>{if(e.pointerId!==sp)return;sp=null;inp.sx=inp.sy=0;knob.style.transform=''};
   stick.addEventListener('pointerup',endS);stick.addEventListener('pointercancel',endS);
+  const aimStick=$('#aimStick'),aimKnob=$('#aimKnob');let ap=null;
+  const setAimStick=e=>{
+    const r=aimStick.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
+    let dx=e.clientX-cx,dy=e.clientY-cy;const m=Math.hypot(dx,dy),lim=r.width*.36;
+    if(m>lim){dx=dx/m*lim;dy=dy/m*lim}
+    aimKnob.style.transform=`translate(${dx}px,${dy}px)`;
+    if(Math.hypot(dx,dy)/lim>.2)inp.touchAim=Math.atan2(dy,dx);
+  };
+  aimStick.addEventListener('pointerdown',e=>{ap=e.pointerId;aimStick.setPointerCapture(e.pointerId);setAimStick(e);e.preventDefault()});
+  aimStick.addEventListener('pointermove',e=>{if(e.pointerId===ap)setAimStick(e)});
+  const endA=e=>{if(e.pointerId!==ap)return;ap=null;inp.touchAim=null;aimKnob.style.transform=''};
+  aimStick.addEventListener('pointerup',endA);aimStick.addEventListener('pointercancel',endA);
   const fb=$('#fireBtn');let fp=null;
   fb.addEventListener('pointerdown',e=>{fp=e.pointerId;fb.setPointerCapture(e.pointerId);inp.aim=null;inp.fireHeld=true;fb.classList.add('act');e.preventDefault()});
   const endF=e=>{if(e.pointerId!==fp)return;fp=null;fb.classList.remove('act');inp.fireHeld=false;inp.aim=null};
@@ -748,16 +770,17 @@ function playerTick(p,dt){
   if(rotate){p.ang+=rotate*3.6*dt;keyboardAimLocked=true}
   const mouseLocked=activeControl()==='mouse'&&document.pointerLockElement===cv;
   if(mouseLocked){if(inp.mouseTurn){p.ang+=inp.mouseTurn;inp.mouseTurn=0}keyboardAimLocked=true}
+  const aim=activeControl()==='touch'&&!cfg.touchAimWithMove?inp.touchAim:inp.aim;
   const drawing=holdFire&&p.alive&&p.loaded[p.sel]&&p.cd<=0;
   const want=!!(inp.reload||keyDown('reload')||K.KeyK)||(drawing&&p.g>.25);
   tickBody(p,dt,want&&p.alive);
   if(holdFire&&!p.wasHold&&p.alive&&!p.loaded[p.sel])toast('矢がない','R を押し続けて装填',1000);
   p.wasHold=holdFire;
-  if(drawing){p.draw+=dt;p.snap=inp.aim==null;p.pick=pickAim(p,p.ang,p.snap?.42:.2)}
+  if(drawing){p.draw+=dt;p.snap=aim==null;p.pick=pickAim(p,p.ang,p.snap?.42:.2)}
   else{if(p.draw>0&&!holdFire)releaseShot(p);if(inp.mouseTap&&p.alive)fire(p,p.ang,false);inp.mouseTap=false;p.draw=0;p.pick=null}
-  if(inp.aim!=null&&!mouseLocked){p.ang=inp.aim;keyboardAimLocked=true}
-  else if(m>.2&&activeControl()==='touch')p.ang=Math.atan2(my,mx);
-  else if(m>.2&&activeControl()!=='mouse'&&!(K.ShiftLeft||K.ShiftRight)&&!keyboardAimLocked)p.ang=Math.atan2(my,mx);
+  if(aim!=null&&!mouseLocked){p.ang=aim;keyboardAimLocked=true}
+  else if(m>.2&&activeControl()==='touch'&&cfg.touchAimWithMove)p.ang=Math.atan2(my,mx);
+  else if(m>.2&&activeControl()!=='mouse'&&activeControl()!=='touch'&&!(K.ShiftLeft||K.ShiftRight)&&!keyboardAimLocked)p.ang=Math.atan2(my,mx);
   if(m>.05){
     const ox=p.x,oy=p.y;moveEnt(p,mx*speedOf(p)*(drawing?.6:1)*dt,my*speedOf(p)*(drawing?.6:1)*dt);
     p.vx=lerp(p.vx,(p.x-ox)/dt,.4);p.vy=lerp(p.vy,(p.y-oy)/dt,.4);
