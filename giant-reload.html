@@ -25,6 +25,9 @@ body.mouse-locked,body.mouse-locked *{cursor:none!important}
 #score .dot{width:10px;height:10px;border-radius:50%;flex:none;border:2px solid var(--ink);box-sizing:border-box}
 #score .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
 #score .k{font-family:var(--f-mono)}
+#score .row.player-score{font-size:10px;color:var(--dim)}
+#score .row.team-total{font-size:16px;color:var(--ink);padding:4px 0}
+#score .team-total .k{font-size:18px;color:var(--red)}
 #score .me .nm{color:var(--red)}#score .dead{opacity:.45}
 #timer{position:absolute;right:calc(var(--gr) + 98px);top:var(--gt);padding:3px 14px;font-family:var(--f-mono);font-size:20px;font-weight:700}
 #timer small{display:block;font-family:var(--f-disp);font-size:10px;color:var(--dim);text-align:center}
@@ -758,8 +761,8 @@ function updateHud(dt){
   if(scoreAcc<=0){
     scoreAcc=.25;
     const rows=[...ents].sort((a,b)=>(matchRules.teamMode?(a.team??0)-(b.team??0):0)||b.kills-a.kills||a.deaths-b.deaths);
-    $('#score').innerHTML=rows.map(e=>`<div class="row${e.isPlayer?' me':''}${e.alive?'':' dead'}"><span class="dot" style="background:${e.color}"></span><span class="nm">${matchRules.teamMode?`T${e.team+1} `:''}${e.name}</span><span class="k">${e.kills}</span></div>`).join('')
-      +(matchRules.teamMode?teamTotals().map((total,i)=>`<div class="row" style="color:var(--dim);font-size:10px"><span class="nm">チーム${i+1} 合計</span><span class="k">${total}</span></div>`).join(''):'')
+    $('#score').innerHTML=(matchRules.teamMode?teamTotals().map((total,i)=>`<div class="row team-total"><span class="nm">チーム${i+1} 合計</span><span class="k">${total}</span></div>`).join(''):'')
+      +rows.map(e=>`<div class="row${matchRules.teamMode?' player-score':''}${e.isPlayer?' me':''}${e.alive?'':' dead'}"><span class="dot" style="background:${e.color}"></span><span class="nm">${matchRules.teamMode?`T${e.team+1} `:''}${e.name}</span><span class="k">${e.kills}</span></div>`).join('')
       +`<div class="row" style="color:var(--dim);font-size:10px;letter-spacing:.1em"><span class="nm">${matchRules.teamMode?'チーム合計・先取':'先取'} ${matchRules.kills} キル</span></div>`;
   }
   const bn=$('#banner');
