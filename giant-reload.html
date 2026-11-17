@@ -236,6 +236,7 @@ repairUi();
 const angDiff=(a,b)=>{let d=(b-a)%(Math.PI*2);if(d>Math.PI)d-=Math.PI*2;if(d<-Math.PI)d+=Math.PI*2;return d};
 const C={ARROW_V:15,SMALL_SPEED:4.2,GIANT_SPEED:2.8,RELOAD_T:.9,GIANT_MAX:2,LOCKOUT:.8,VIS_SMALL:6.5,VIS_GIANT:11,REVEAL:13,MATCH_T:180,TARGET:10,CRATE_MAX:4,DRAW_T:.45};
 const MAP_SIZES={small:{w:8,h:6,label:'小'},medium:{w:10,h:8,label:'中'},large:{w:13,h:10,label:'大'}};
+const TEAM_COLORS=['#c8412f','#2f6f8f','#708d37','#9a5c9e'];
 let matchRules={time:C.MATCH_T,kills:C.TARGET,mapSize:'medium',bots:3,aimAssist:true,teamMode:false,teamCount:2,teamAssignment:'random',botTeams:[]};
 const TYPES={n:{name:'通常矢',icon:'矢',key:'1',max:15,col:'#2a2420'},f:{name:'フラッシュ',icon:'閃',key:'2',max:3,col:'#d48a00'}};
 const TYPE_KEYS=['n','f'];
@@ -475,10 +476,10 @@ function startMatch(){
   genMap(matchRules.mapSize); nextId=1; T=0; timeLeft=matchRules.time; keyboardAimLocked=false; arrows=[];decoys=[];smokes=[];fx=[];crates=[];crateT=5;feed=[];$('#feed').innerHTML='';
   const roster=net.started&&net.players.length?net.players:null;
   const me=roster&&roster.find(p=>p.id===net.id);
-  player=mkEnt(me?.name||'あなた',PLAYER_COL,true);player.netId=net.id;if(matchRules.teamMode)player.team=me?.team??0;ents=[player];
-  if(roster){for(const [i,r] of roster.entries()){if(r.id===net.id)continue;const e=mkEnt(r.name,BOTS[i%BOTS.length].c,false);e.isRemote=true;e.netId=r.id;if(matchRules.teamMode)e.team=r.team??0;ents.push(e)}}
+  player=mkEnt(me?.name||'あなた',PLAYER_COL,true);player.netId=net.id;if(matchRules.teamMode){player.team=me?.team??0;player.color=TEAM_COLORS[player.team]||player.color}ents=[player];
+  if(roster){for(const [i,r] of roster.entries()){if(r.id===net.id)continue;const e=mkEnt(r.name,BOTS[i%BOTS.length].c,false);e.isRemote=true;e.netId=r.id;if(matchRules.teamMode){e.team=r.team??0;e.color=TEAM_COLORS[e.team]||e.color}ents.push(e)}}
   const botCount=roster?matchRules.bots:cfg.bots;
-  for(let i=0;i<botCount;i++){const bot=mkEnt(i<BOTS.length?BOTS[i].n:`${BOTS[i%BOTS.length].n} ${Math.floor(i/BOTS.length)+1}`,BOTS[i%BOTS.length].c,false);if(matchRules.teamMode)bot.team=matchRules.botTeams[i]??i%matchRules.teamCount;ents.push(bot)}
+  for(let i=0;i<botCount;i++){const bot=mkEnt(i<BOTS.length?BOTS[i].n:`${BOTS[i%BOTS.length].n} ${Math.floor(i/BOTS.length)+1}`,BOTS[i%BOTS.length].c,false);if(matchRules.teamMode){bot.team=matchRules.botTeams[i]??i%matchRules.teamCount;bot.color=TEAM_COLORS[bot.team]||bot.color}ents.push(bot)}
   for(const e of ents)e.alive=false;
   for(const e of ents){const p=pickSpawn(e);e.x=p.x;e.y=p.y;e.alive=true;e.inv=roster?0:1.2;e.ang=rnd(0,6.28);}
   cam.x=player.x;cam.y=player.y;cam.g=0;
@@ -1193,7 +1194,6 @@ function renderPublicRooms(rooms){
   box.innerHTML=rooms.map(r=>`<div class="public-room"><div class="public-room-info"><b>${r.name}</b><small>${r.players}/${r.maxPlayers}人　${r.started?'試合中':'待機中'}${r.codeRequired?'　🔒コード必要':''}</small></div>${r.started||r.players>=r.maxPlayers?'':'<button class="btn" data-room-id="'+r.id+'">参加</button>'}</div>`).join('');
   box.querySelectorAll('[data-room-id]').forEach(b=>b.addEventListener('click',()=>joinPublicRoom(b.dataset.roomId)));
 }
-const TEAM_COLORS=['#c8412f','#2f6f8f','#708d37','#9a5c9e'];
 function renderTeamAssignments(room,owner){
   const board=$('#teamAssignments'),settings=room.settings;
   board.hidden=!settings.teamMode||settings.teamAssignment!=='manual';
