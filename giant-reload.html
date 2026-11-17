@@ -1238,7 +1238,7 @@ $('#teamAssignments').addEventListener('drop',e=>{
   if(!card)return;const select=card.querySelector('select');if(select){select.value=column.dataset.team;sendTeamAssignments()}
 });
 function updateRoomView(room){
-  net.room=room;$('#roomBrowser').hidden=true;$('#room').hidden=false;$('#roomCode').textContent=room.code||'なし';$('#room .res-h').textContent=room.name||'オンライン部屋';
+  net.room=room;if(state==='over')return;$('#roomBrowser').hidden=true;$('#room').hidden=false;$('#roomCode').textContent=room.code||'なし';$('#room .res-h').textContent=room.name||'オンライン部屋';
   const players=room.players||[],settings=room.settings,botCount=Math.max(0,Math.min(16,Number(settings.bots)||0));
   const playerRows=players.map(p=>`<div class="${p.id===room.ownerId?'owner':''}">${settings.teamMode?`[チーム${(p.team??0)+1}] `:''}👤 ${p.name}${p.id===room.ownerId?'　★オーナー':''}</div>`).join('');
   const botRows=Array.from({length:botCount},(_,i)=>{
