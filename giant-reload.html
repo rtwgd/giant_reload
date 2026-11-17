@@ -107,6 +107,7 @@ kbd{font-family:var(--f-mono);font-size:11px;background:#fff8e6;border:1px solid
 .rank{width:100%;border-collapse:collapse;margin:14px 0;font-size:15px}.rank th{font-size:11px;color:var(--dim);text-align:left;padding:4px 8px}
 .rank td{padding:8px;border-top:1px solid #2a242040;font-family:var(--f-mono)}.rank td:nth-child(2){font-family:var(--f-disp);font-weight:700}.rank tr.me td{color:var(--red)}
 .res-h{font-family:'Dela Gothic One',var(--f-disp);font-weight:400;font-size:clamp(30px,7vw,46px);margin:0}
+.control-settings-box{max-width:760px;max-height:calc(100vh - 36px);max-height:calc(100dvh - 36px);overflow-y:auto}.control-settings-box .settings-panel{max-height:none;overflow:visible}
 .res-box{width:100%;max-width:520px;margin:auto 0;background:rgba(246,239,220,.97);border:2px solid var(--ink);border-radius:10px;padding:clamp(18px,4vw,32px);box-shadow:6px 6px 0 var(--ink)}
 #result .res-h{color:var(--ink);text-shadow:none}.rank{background:#fff8e6;border:2px solid var(--ink);border-radius:6px;overflow:hidden}.rank th{background:#e0a526;color:var(--ink)}.rank td{color:var(--ink)}.rank tr.me td{color:var(--red);font-weight:700}
 </style></head><body>
@@ -185,6 +186,7 @@ kbd{font-family:var(--f-mono);font-size:11px;background:#fff8e6;border:1px solid
     <div id="roomPlayers" class="room-players"></div>
     <div id="ownerSettings" hidden><label>ゲーム時間（秒）<input id="roomTime" class="room-number" type="number" min="30" max="1800" value="180"></label><label>勝利キル数<input id="roomKills" class="room-number" type="number" min="1" max="100" value="10"></label><label>最大人数<input id="roomMax" class="room-number" type="number" min="2" max="32" value="8"></label><label>ボット人数<input id="roomBots" class="room-number" type="number" min="0" max="16" step="1" value="3"></label><label class="room-check"><input id="roomTeamMode" type="checkbox"> チーム戦</label><label>チーム数<select id="roomTeamCount" class="room-number"><option value="2">2チーム</option><option value="3">3チーム</option><option value="4">4チーム</option></select></label><label>チーム分け<select id="roomTeamAssignment" class="room-number"><option value="random">ランダム</option><option value="manual">手動</option></select></label><label>マップサイズ<select id="roomMapSize" class="room-number"><option value="small">小</option><option value="medium" selected>中</option><option value="large">大</option></select></label><label class="room-check"><input id="roomAimAssist" type="checkbox" checked> 弓の照準を自動補正</label></div>
     <div id="teamAssignments" class="team-setup" hidden></div>
+    <button class="btn" data-open-control-settings type="button">操作プリセット・設定</button>
     <button class="btn go" id="startRoomBtn" disabled>オーナーがゲーム開始</button>
     <button class="btn ghost" id="leaveRoomBtn">メニューへ戻る</button>
   </div>
@@ -203,6 +205,7 @@ kbd{font-family:var(--f-mono);font-size:11px;background:#fff8e6;border:1px solid
   <div class="res-box">
     <h2 class="res-h">一時停止</h2>
     <p class="lead">リロード（巨大化）は連続2秒まで。小さい間に撃ち、見たい時だけ大きくなる。</p>
+    <button class="btn" data-open-control-settings type="button">操作プリセット・設定</button>
     <button class="btn go" id="resumeBtn">再開</button>
     <button class="btn ghost" id="quitBtn">メニューへ</button>
   </div>
@@ -259,6 +262,18 @@ function repairUi(){
     <tr><td>武器切替</td><td><kbd>1</kbd> 通常弓、<kbd>2</kbd> フラッシュ、<kbd>Q</kbd><kbd>E</kbd> で切替。</td></tr>
     <tr><td>タッチ操作</td><td>左スティックで移動、右スティックまたは射撃ボタンのドラッグで照準。射撃ボタンを長押しして離すと発射。設定で左スティックに照準操作をまとめられます。</td></tr>
     <tr><td>その他</td><td><kbd>F</kbd> 全画面、<kbd>P</kbd> 一時停止、<kbd>M</kbd> ミュート。</td></tr></table></div></div>`;
+  const controlOverlay=document.createElement('div');
+  controlOverlay.id='controlSettingsOverlay';controlOverlay.className='overlay';controlOverlay.hidden=true;
+  controlOverlay.innerHTML='<div class="res-box control-settings-box"><h2 class="res-h">操作プリセット・設定</h2><button class="btn ghost" id="closeControlSettings" type="button">閉じる</button><div id="controlSettingsContent"></div></div>';
+  const controlContent=controlOverlay.querySelector('#controlSettingsContent');
+  controlContent.append($('#optControl').closest('.opt'),$('#settingsBtn'),$('#settingsPanel'));
+  document.body.append(controlOverlay);
+  const menuSettingsButton=document.createElement('button');
+  menuSettingsButton.className='btn';menuSettingsButton.type='button';menuSettingsButton.dataset.openControlSettings='';menuSettingsButton.textContent='操作プリセット・設定';
+  $('#optDiff').closest('.opt').before(menuSettingsButton);
+  document.querySelectorAll('[data-open-control-settings]').forEach(button=>button.addEventListener('click',()=>{controlOverlay.hidden=false}));
+  $('#closeControlSettings').addEventListener('click',()=>{controlOverlay.hidden=true});
+  controlOverlay.addEventListener('click',event=>{if(event.target===controlOverlay)controlOverlay.hidden=true});
   $('#pause .res-box h2').textContent='一時停止'; $('#resumeBtn').textContent='再開'; $('#quitBtn').textContent='メニューへ';
   $('#againBtn').textContent='もう一度'; $('#menuBtn').textContent='メニューへ';
 }
@@ -643,6 +658,7 @@ window.addEventListener('keydown',e=>{
 window.addEventListener('keydown',e=>{
   if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();
   if(rebinding){const {action,slot}=rebinding;cfg.keys[action][slot]=e.code==='Escape'?null:e.code;rebinding=null;updateSettingsUI();savePreferences();e.preventDefault();return}
+  if(!$('#controlSettingsOverlay').hidden){if(e.code==='Escape'){$('#controlSettingsOverlay').hidden=true;e.preventDefault()}return}
   if(e.repeat)return;
   K[e.code]=true;
   if(keyDown('mute')){mute=!mute;return}
