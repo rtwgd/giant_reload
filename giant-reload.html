@@ -631,8 +631,14 @@ function releaseShot(p){
   if(r){lob=r.lob;if(p.snap)ang=r.a}
   fire(p,ang,lob,lerp(8,C.ARROW_V,Math.min(1,t/C.DRAW_T)));
 }
+function isBrowserShortcut(e){
+  const modifierKey=['ControlLeft','ControlRight','MetaLeft','MetaRight'].includes(e.code);
+  return ((e.ctrlKey||e.metaKey)&&!modifierKey)||
+    (e.altKey&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','F4'].includes(e.code))||
+    ['F5','F6','F11','Backspace'].includes(e.code);
+}
 window.addEventListener('keydown',e=>{
-  if(state==='play'&&cfg.reloadInput==='keyboard'&&e.ctrlKey&&e.code==='KeyS'&&cfg.keys.reload.some(key=>key==='ControlLeft'||key==='ControlRight'))e.preventDefault();
+  if(state==='play'&&isBrowserShortcut(e))e.preventDefault();
 },{capture:true});
 window.addEventListener('keydown',e=>{
   if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();
