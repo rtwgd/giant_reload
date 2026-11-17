@@ -757,7 +757,7 @@ function updateHud(dt){
   scoreAcc-=dt;
   if(scoreAcc<=0){
     scoreAcc=.25;
-    const rows=[...ents].sort((a,b)=>b.kills-a.kills||a.deaths-b.deaths);
+    const rows=[...ents].sort((a,b)=>(matchRules.teamMode?(a.team??0)-(b.team??0):0)||b.kills-a.kills||a.deaths-b.deaths);
     $('#score').innerHTML=rows.map(e=>`<div class="row${e.isPlayer?' me':''}${e.alive?'':' dead'}"><span class="dot" style="background:${e.color}"></span><span class="nm">${matchRules.teamMode?`T${e.team+1} `:''}${e.name}</span><span class="k">${e.kills}</span></div>`).join('')
       +(matchRules.teamMode?teamTotals().map((total,i)=>`<div class="row" style="color:var(--dim);font-size:10px"><span class="nm">チーム${i+1} 合計</span><span class="k">${total}</span></div>`).join(''):'')
       +`<div class="row" style="color:var(--dim);font-size:10px;letter-spacing:.1em"><span class="nm">${matchRules.teamMode?'チーム合計・先取':'先取'} ${matchRules.kills} キル</span></div>`;
