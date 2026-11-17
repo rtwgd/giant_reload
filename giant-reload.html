@@ -44,10 +44,10 @@ body.mouse-locked,body.mouse-locked *{cursor:none!important}
 .slot .ky{position:absolute;left:4px;top:2px;font-family:var(--f-mono);font-size:9px;color:var(--dim)}
 .slot.sel{background:var(--yel)}.slot.on{background:var(--blue);color:#fff}.slot.on .ky{color:#fff}.slot.empty{opacity:.45}
 #touch{display:none}body.touch #touch{display:block}body.touch .slot .ky{display:none}
-#stick{position:absolute;left:var(--gl);bottom:calc(var(--gb) + 138px);width:92px;height:92px;border-radius:50%;pointer-events:auto;touch-action:none;background:rgba(236,227,205,.07);border:2px dashed rgba(236,227,205,.5)}
+#stick{position:absolute;left:var(--gl);bottom:calc(var(--gb) + 32px);width:92px;height:92px;border-radius:50%;pointer-events:auto;touch-action:none;background:rgba(236,227,205,.07);border:2px dashed rgba(236,227,205,.5)}
 #knob{position:absolute;left:50%;top:50%;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;background:var(--paper);border:2px solid var(--ink);opacity:.8}
 #fireBtn,#reloadBtn{position:absolute;right:var(--gr);border-radius:50%;pointer-events:auto;touch-action:none;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:700;line-height:1.2;color:#fff;border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink)}
-#fireBtn{bottom:var(--gb);width:128px;height:128px;overflow:hidden;background:radial-gradient(circle,#df5947 0 42%,var(--red) 43%);font-size:18px}
+#fireBtn{bottom:calc(var(--gb) + 13px);width:128px;height:128px;overflow:hidden;background:radial-gradient(circle,#df5947 0 42%,var(--red) 43%);font-size:18px}
 #fireBtn::before,#fireBtn::after{content:'';position:absolute;border-radius:50%;pointer-events:none}
 #fireBtn::before{inset:9px;border:1px dashed rgba(255,255,255,.72)}
 #fireBtn::after{inset:22px;border:1px solid rgba(255,255,255,.3)}
@@ -600,13 +600,13 @@ window.addEventListener('touchstart',enableTouch,{once:true,passive:true});
     let dx=e.clientX-cx,dy=e.clientY-cy;const m=Math.hypot(dx,dy),lim=r.width*.36;
     if(m>lim){dx=dx/m*lim;dy=dy/m*lim}
     fireKnob.style.transform=`translate(${dx}px,${dy}px)`;
-    inp.touchAim=m/lim>.2?Math.atan2(dy,dx):null;
+    inp.touchAim=!cfg.touchAimWithMove&&m/lim>.2?Math.atan2(dy,dx):null;
   };
   fb.addEventListener('pointerdown',e=>{fp=e.pointerId;fb.setPointerCapture(e.pointerId);inp.aim=null;inp.fireHeld=true;fb.classList.add('act');fb.querySelector('.fire-guide strong').textContent='チャージ中';setFireAim(e);e.preventDefault()});
   fb.addEventListener('pointermove',e=>{if(e.pointerId===fp)setFireAim(e)});
   const endF=e=>{
     if(e.pointerId!==fp)return;
-    setFireAim(e);if(inp.touchAim!=null&&player)player.ang=inp.touchAim;
+    setFireAim(e);if(!cfg.touchAimWithMove&&inp.touchAim!=null&&player)player.ang=inp.touchAim;
     fp=null;fb.classList.remove('act');fb.querySelector('.fire-guide strong').textContent='照準・射撃';inp.fireHeld=false;inp.aim=null;inp.touchAim=null;fireKnob.style.transform='';
   };
   fb.addEventListener('pointerup',endF);fb.addEventListener('pointercancel',endF);
@@ -809,7 +809,7 @@ function playerTick(p,dt){
   if(rotate){p.ang+=rotate*3.6*dt;keyboardAimLocked=true}
   const mouseLocked=activeControl()==='mouse'&&document.pointerLockElement===cv;
   if(mouseLocked){if(inp.mouseTurn){p.ang+=inp.mouseTurn;inp.mouseTurn=0}keyboardAimLocked=true}
-  const aim=activeControl()==='touch'?(inp.touchAim??(cfg.touchAimWithMove?null:inp.aim)):inp.aim;
+  const aim=activeControl()==='touch'?(cfg.touchAimWithMove?null:(inp.touchAim??inp.aim)):inp.aim;
   const drawing=holdFire&&p.alive&&p.loaded[p.sel]&&p.cd<=0;
   const want=!!(inp.reload||keyDown('reload')||K.KeyK)||(drawing&&p.g>.25);
   tickBody(p,dt,want&&p.alive);
