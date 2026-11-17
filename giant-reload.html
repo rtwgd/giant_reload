@@ -63,8 +63,8 @@ body.mouse-locked,body.mouse-locked *{cursor:none!important}
 @media (min-width:700px){#timer{left:50%;right:auto;transform:translateX(-50%)}}
 @media (orientation:portrait){body.touch #dock{bottom:calc(var(--gb) + 216px)}}
 @media (orientation:landscape) and (max-height:520px){
- #stick{bottom:var(--gb);width:92px;height:92px}#knob{width:44px;height:44px;margin:-22px 0 0 -22px}
- #fireBtn{width:108px;height:108px}#reloadBtn{width:78px;height:78px;bottom:calc(var(--gb) + 8px);right:calc(var(--gr) + 122px)}
+ #stick{bottom:calc(var(--gb) + 24px);width:92px;height:92px}#knob{width:44px;height:44px;margin:-22px 0 0 -22px}
+ #fireBtn{bottom:calc(var(--gb) + 16px);width:108px;height:108px}#reloadBtn{width:78px;height:78px;bottom:calc(var(--gb) + 31px);right:calc(var(--gr) + 122px)}
  .slot{width:46px;height:48px}.slot .ic{font-size:17px}#chip{font-size:11px}#dock{gap:5px}
  #score{font-size:11px;min-width:112px;padding:4px 8px}#feed{display:none}#timer{font-size:16px}#banner{top:18%;font-size:20px}}
 .overlay{position:fixed;inset:0;z-index:20;overflow-y:auto;touch-action:pan-y;color:var(--ink);background:var(--paper) linear-gradient(#0000 23px,#2a24200f 24px) 0 0/24px 24px,linear-gradient(90deg,#0000 23px,#2a24200f 24px) 0 0/24px 24px;
@@ -234,7 +234,7 @@ let matchRules={time:C.MATCH_T,kills:C.TARGET,mapSize:'medium',bots:3};
 const TYPES={n:{name:'通常矢',icon:'矢',key:'1',max:15,col:'#2a2420'},f:{name:'フラッシュ',icon:'閃',key:'2',max:3,col:'#d48a00'}};
 const TYPE_KEYS=['n','f'];
 const DIFF={easy:{react:.75,err:.2,turn:4.5,spd:.88,scout:12},normal:{react:.4,err:.1,turn:7.5,spd:1,scout:8.5},hard:{react:.2,err:.045,turn:12,spd:1.06,scout:6}};
-const cfg={diff:'normal',bots:3,control:'auto',touchAimWithMove:false,mouseSensitivity:.0045,keys:{up:['KeyW'],down:['KeyS'],left:['KeyA'],right:['KeyD'],fire:['Space'],reload:['KeyR'],weaponN:['Digit1'],weaponF:['Digit2']}};
+const cfg={diff:'normal',bots:3,control:'touch',touchAimWithMove:false,mouseSensitivity:.0045,keys:{up:['KeyW'],down:['KeyS'],left:['KeyA'],right:['KeyD'],fire:['Space'],reload:['KeyR'],weaponN:['Digit1'],weaponF:['Digit2']}};
 const SETTINGS_KEY='gr_settings';
 function readPreferences(){
   let raw;
