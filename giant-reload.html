@@ -67,7 +67,7 @@ body.mouse-locked,body.mouse-locked *{cursor:none!important}
 @media (orientation:landscape) and (max-height:520px){
  #stick{bottom:calc(var(--gb) + 24px);width:92px;height:92px}#knob{width:44px;height:44px;margin:-22px 0 0 -22px}
  #aimStick{bottom:calc(var(--gb) + 116px)}
- #fireBtn{bottom:calc(var(--gb) + 16px);width:108px;height:108px}#reloadBtn{width:78px;height:78px;bottom:calc(var(--gb) + 31px);right:calc(var(--gr) + 122px)}
+ #fireBtn{bottom:calc(var(--gb) + 16px);width:108px;height:108px}#reloadBtn{width:78px;height:78px;bottom:calc(var(--gb) + 132px);right:calc(var(--gr) + 15px)}
  .slot{width:46px;height:48px}.slot .ic{font-size:17px}#chip{font-size:11px}#dock{gap:5px}
  #score{font-size:11px;min-width:112px;padding:4px 8px}#feed{display:none}#timer{font-size:16px}#banner{top:18%;font-size:20px}}
 .overlay{position:fixed;inset:0;z-index:20;overflow-y:auto;touch-action:pan-y;color:var(--ink);background:var(--paper) linear-gradient(#0000 23px,#2a24200f 24px) 0 0/24px 24px,linear-gradient(90deg,#0000 23px,#2a24200f 24px) 0 0/24px 24px;
@@ -877,7 +877,7 @@ function playerTick(p,dt){
   else if(m>.2&&aimSource==='touch'&&movementInput()==='touch'&&cfg.touchAimWithMove)p.ang=Math.atan2(my,mx);
   else if(m>.2&&keyboardAim&&!(K.ShiftLeft||K.ShiftRight)&&!keyboardAimLocked)p.ang=Math.atan2(my,mx);
   let moveX=mx,moveY=my;
-  if(movementInput()!=='touch'){
+  if(movementInput()==='keyboard'){
     if(m>.05){
       const target=Math.atan2(my,mx),current=Math.hypot(p.moveX,p.moveY)>.01?Math.atan2(p.moveY,p.moveX):target;
       const turn=clamp(angDiff(current,target),-10*dt,10*dt),angle=current+turn;
