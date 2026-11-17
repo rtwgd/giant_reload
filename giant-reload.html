@@ -632,6 +632,9 @@ function releaseShot(p){
   fire(p,ang,lob,lerp(8,C.ARROW_V,Math.min(1,t/C.DRAW_T)));
 }
 window.addEventListener('keydown',e=>{
+  if(state==='play'&&cfg.reloadInput==='keyboard'&&e.ctrlKey&&e.code==='KeyS'&&cfg.keys.reload.some(key=>key==='ControlLeft'||key==='ControlRight'))e.preventDefault();
+},{capture:true});
+window.addEventListener('keydown',e=>{
   if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();
   if(rebinding){const {action,slot}=rebinding;cfg.keys[action][slot]=e.code==='Escape'?null:e.code;rebinding=null;updateSettingsUI();savePreferences();e.preventDefault();return}
   if(e.repeat)return;
