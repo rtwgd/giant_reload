@@ -492,7 +492,7 @@ let nextId=1, T=0, state='menu', timeLeft=C.MATCH_T;
 let player=null, ents=[], decoys=[], arrows=[], fx=[], crates=[], crateT=6, feed=[];
 const cam={x:0,y:0,z:40,g:0};
 function mkEnt(name,color,isPlayer){
-  return {id:nextId++,name,color,isPlayer,x:1.5,y:1.5,vx:0,vy:0,moveX:0,moveY:0,ang:0,g:0,hold:0,lock:0,rl:0,rlBy:{n:0,f:0,p:0},loaded:{n:false,f:false,p:false},nocked:null,
+  return {id:nextId++,name,color,isPlayer,x:1.5,y:1.5,vx:0,vy:0,ang:0,g:0,hold:0,lock:0,rl:0,rlBy:{n:0,f:0,p:0},loaded:{n:false,f:false,p:false},nocked:null,
     ammo:{n:15,f:3,p:2},sel:'n',shield:1,shUp:false,shT:0,decoys:2,decoyCD:0,cd:0,draw:0,alive:true,resp:0,inv:0,
     kills:0,deaths:0,blind:0,ai:isPlayer?null:{path:null,pi:0,rp:0,gk:-1,goal:null,tid:null,seen:0,last:null,err:0,sd:1,sdT:0,
       scoutT:rnd(3,8),scoutH:0,hide:null,hideAt:-9,blindDir:0,bt:0,stk:0,sx:0,sy:0,want:false}};
@@ -951,16 +951,15 @@ function playerTick(p,dt){
   if(aim!=null&&!mouseLocked){p.ang=aim;keyboardAimLocked=true}
   else if(m>.2&&aimSource==='touch'&&movementInput()==='touch'&&cfg.touchAimWithMove)p.ang=Math.atan2(my,mx);
   else if(m>.2&&keyboardAim&&!keyDown('shift')&&!keyboardAimLocked)p.ang=Math.atan2(my,mx);
-  let moveX=mx,moveY=my;
   if(movementInput()==='keyboard'){
-    if(m>.05){
-      const target=Math.atan2(my,mx),current=Math.hypot(p.moveX,p.moveY)>.01?Math.atan2(p.moveY,p.moveX):target;
-      const turn=clamp(angDiff(current,target),-10*dt,10*dt),angle=current+turn;
-      p.moveX=moveX=Math.cos(angle);p.moveY=moveY=Math.sin(angle);
-    }else p.moveX=p.moveY=0;
-  }
-  if(Math.hypot(moveX,moveY)>.01){
-    const ox=p.x,oy=p.y;moveEnt(p,moveX*speedOf(p)*(drawing?.6:1)*dt,moveY*speedOf(p)*(drawing?.6:1)*dt);
+    const response=1-Math.exp(-14*dt),targetSpeed=speedOf(p)*(drawing?.6:1);
+    p.vx=lerp(p.vx,mx*targetSpeed,response);p.vy=lerp(p.vy,my*targetSpeed,response);
+    const ox=p.x,oy=p.y,dx=p.vx*dt,dy=p.vy*dt;
+    moveEnt(p,dx,dy);
+    if(dx&&p.x===ox)p.vx=0;
+    if(dy&&p.y===oy)p.vy=0;
+  }else if(m>.01){
+    const ox=p.x,oy=p.y;moveEnt(p,mx*speedOf(p)*(drawing?.6:1)*dt,my*speedOf(p)*(drawing?.6:1)*dt);
     p.vx=lerp(p.vx,(p.x-ox)/dt,.4);p.vy=lerp(p.vy,(p.y-oy)/dt,.4);
   }else{p.vx*=.7;p.vy*=.7}
 }
