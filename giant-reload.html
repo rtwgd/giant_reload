@@ -499,14 +499,16 @@ function resetLoadout(e){
   e.ammo={n:15,f:3,s:2};e.sel='n';e.loaded={n:false,f:false};e.nocked=null;e.rlBy={n:0,f:0};e.shield=1;e.shUp=false;e.decoys=2;e.decoyCD=0;e.g=0;e.hold=0;e.lock=0;e.rl=0;e.blind=0;e.cd=0;e.draw=0;
 }
 function pickSpawn(e,randomOnly=false){
+  const openFloors=floors.filter(f=>{const x=f%GW+.5,y=((f/GW)|0)+.5;return !blocked(x,y,.3)});
+  if(!openFloors.length)throw new Error('Cannot find a valid spawn position on the current map.');
   if(randomOnly){
-    const candidates=floors.filter(f=>{const x=f%GW+.5,y=((f/GW)|0)+.5;return ents.every(o=>o===e||!o.alive||Math.hypot(o.x-x,o.y-y)>1.5)});
-    const f=candidates.length?candidates[(Math.random()*candidates.length)|0]:floors[(Math.random()*floors.length)|0];
+    const candidates=openFloors.filter(f=>{const x=f%GW+.5,y=((f/GW)|0)+.5;return ents.every(o=>o===e||!o.alive||Math.hypot(o.x-x,o.y-y)>1.5)});
+    const f=candidates.length?candidates[(Math.random()*candidates.length)|0]:openFloors[(Math.random()*openFloors.length)|0];
     return {x:f%GW+.5,y:((f/GW)|0)+.5};
   }
   let best=null,bd=-1;
   for(let i=0;i<50;i++){
-    const f=floors[(Math.random()*floors.length)|0],x=f%GW+.5,y=((f/GW)|0)+.5;
+    const f=openFloors[(Math.random()*openFloors.length)|0],x=f%GW+.5,y=((f/GW)|0)+.5;
     let md=99; for(const o of ents){if(o===e||!o.alive)continue;md=Math.min(md,Math.hypot(o.x-x,o.y-y))}
     if(md>bd){bd=md;best={x,y}}
   }
@@ -516,8 +518,9 @@ function respawn(e){
   const p=pickSpawn(e,true); e.x=p.x;e.y=p.y;e.vx=e.vy=0;e.alive=true;e.inv=1.6;resetLoadout(e);e.ang=rnd(0,6.28);
   if(e.ai){e.ai.path=null;e.ai.last=null;e.ai.tid=null;e.ai.hide=null;e.ai.goal=null}
 }
-function startMatch(){
-  genMap(matchRules.mapSize); nextId=1; T=0; timeLeft=matchRules.time; keyboardAimLocked=false; arrows=[];decoys=[];smokes=[];fx=[];crates=[];crateT=5;feed=[];$('#feed').innerHTML='';
+function startMatch(useCurrentMap=false){
+  if(!useCurrentMap){genMap(matchRules.mapSize)}
+  nextId=1; T=0; timeLeft=matchRules.time; keyboardAimLocked=false; arrows=[];decoys=[];smokes=[];fx=[];crates=[];crateT=5;feed=[];$('#feed').innerHTML='';
   const roster=net.started&&net.players.length?net.players:null;
   const me=roster&&roster.find(p=>p.id===net.id);
   player=mkEnt(me?.name||'あなた',PLAYER_COL,true);player.netId=net.id;if(matchRules.teamMode){player.team=me?.team??0;player.color=TEAM_COLORS[player.team]||player.color}ents=[player];
@@ -1238,7 +1241,7 @@ function toggleFs(){
 }
 document.querySelectorAll('.fsb').forEach(b=>{if(!canFs)b.hidden=true;else b.addEventListener('click',toggleFs)});
 /* ---------- menu wiring ---------- */
-const net={ws:null,id:null,room:null,players:[],started:false,ended:false,stateAcc:0};
+const net={ws:null,id:null,room:null,players:[],started:false,ended:false,awaitingMap:false,stateAcc:0};
 function netSend(type,payload={}){if(net.ws&&net.ws.readyState===WebSocket.OPEN)net.ws.send(JSON.stringify({type,...payload}))}
 function roomStatus(t){$('#roomStatus').textContent=t}
 function browserStatus(t){$('#browserStatus').textContent=t}
@@ -1314,9 +1317,9 @@ function connectRoomServer(){
     if(m.type==='room_created'||m.type==='room_state')updateRoomView(m.room);
     if(m.type==='error'){roomStatus(m.message);browserStatus(m.message)}
     if(m.type==='return_to_room')showRoomAfterMatch(m.room);
-    if(m.type==='game_start'&&!$('#room').hidden){const bots=m.settings.bots==null?3:Number(m.settings.bots);matchRules={time:m.settings.time,kills:m.settings.kills,mapSize:m.settings.mapSize||'medium',bots:Math.max(0,Math.min(16,Number.isFinite(bots)?bots:3)),aimAssist:m.settings.aimAssist!==false,teamMode:m.settings.teamMode===true,teamCount:Math.max(2,Math.min(4,Number(m.settings.teamCount)||2)),teamAssignment:m.settings.teamAssignment||'random',botTeams:Array.isArray(m.settings.botTeams)?m.settings.botTeams:[]};net.players=m.players||[];net.started=true;net.ended=false;$('#room').hidden=true;startMatch()}
-    if(m.type==='game_end'){net.ended=true;net.started=false;endMatch(true)}
-    if(m.type==='map'&&m.grid){grid=Uint8Array.from(m.grid);GW=m.GW;GH=m.GH;floors=[];for(let i=0;i<grid.length;i++)if(!grid[i])floors.push(i)}
+    if(m.type==='game_start'&&!$('#room').hidden){const bots=m.settings.bots==null?3:Number(m.settings.bots);matchRules={time:m.settings.time,kills:m.settings.kills,mapSize:m.settings.mapSize||'medium',bots:Math.max(0,Math.min(16,Number.isFinite(bots)?bots:3)),aimAssist:m.settings.aimAssist!==false,teamMode:m.settings.teamMode===true,teamCount:Math.max(2,Math.min(4,Number(m.settings.teamCount)||2)),teamAssignment:m.settings.teamAssignment||'random',botTeams:Array.isArray(m.settings.botTeams)?m.settings.botTeams:[]};net.players=m.players||[];net.started=true;net.ended=false;net.awaitingMap=false;if(net.room?.ownerId===net.id){$('#room').hidden=true;startMatch()}else{net.awaitingMap=true;roomStatus('オーナーのマップを読み込み中…')}}
+    if(m.type==='game_end'){net.ended=true;net.started=false;net.awaitingMap=false;endMatch(true)}
+    if(m.type==='map'&&m.grid){grid=Uint8Array.from(m.grid);GW=m.GW;GH=m.GH;floors=[];for(let i=0;i<grid.length;i++)if(!grid[i])floors.push(i);if(net.awaitingMap&&net.started){net.awaitingMap=false;$('#room').hidden=true;startMatch(true)}}
     if(m.type==='peer_state'){const e=ents.find(x=>x.netId===m.id);if(e&&e.isRemote&&m.state&&typeof m.state==='object'){const {arrows:peerArrows,...peerState}=m.state;Object.assign(e,peerState);e.netArrows=Array.isArray(peerArrows)?peerArrows:[]}}
     if(m.type==='remote_hit'&&player&&player.alive){const attacker=ents.find(x=>x.netId===m.attackerId)||player;if(m.type==='remote_hit'&&m.arrowType==='f')flashAt(player.x,player.y,attacker,player);else kill(player,attacker)}
   };
@@ -1327,17 +1330,18 @@ function readPlayerName(){try{return localStorage.getItem('gr_name')||''}catch(e
 function savePlayerName(name){try{localStorage.setItem('gr_name',name)}catch(error){if(error?.name!=='SecurityError')throw error}}
 function openRoom(){state='menu';$('#menu').hidden=true;$('#room').hidden=true;$('#roomBrowser').hidden=false;$('#browserName').value=readPlayerName();$('#publicRooms').innerHTML='<div>読み込み中…</div>';connectRoomServer()}
 function startSinglePlayer(){
-  if(net.ws)net.ws.close();net.ws=null;net.room=null;net.players=[];net.started=false;matchRules={time:C.MATCH_T,kills:C.TARGET,mapSize:'medium',bots:cfg.bots,aimAssist:true,teamMode:false,teamCount:2,teamAssignment:'random',botTeams:[]};
+  if(net.ws)net.ws.close();net.ws=null;net.room=null;net.players=[];net.started=false;net.awaitingMap=false;matchRules={time:C.MATCH_T,kills:C.TARGET,mapSize:'medium',bots:cfg.bots,aimAssist:true,teamMode:false,teamCount:2,teamAssignment:'random',botTeams:[]};
   $('#menu').hidden=true;$('#roomBrowser').hidden=true;$('#room').hidden=true;startMatch();
 }
 function joinPublicRoom(id){const name=$('#browserName').value.trim()||'Player';savePlayerName(name);netSend('join_room',{name,roomId:id})}
-function leaveRoom(){netSend('leave');if(net.ws)net.ws.close();net.ws=null;net.room=null;net.players=[];net.started=false;$('#room').hidden=true;$('#roomBrowser').hidden=true;$('#menu').hidden=false}
+function leaveRoom(){netSend('leave');if(net.ws)net.ws.close();net.ws=null;net.room=null;net.players=[];net.started=false;net.awaitingMap=false;$('#room').hidden=true;$('#roomBrowser').hidden=true;$('#menu').hidden=false}
 function returnToRoom(){
   if(net.room&&net.ws&&net.ws.readyState===WebSocket.OPEN){state='menu';$('#result').hidden=true;$('#menu').hidden=true;$('#roomBrowser').hidden=true;$('#room').hidden=false;updateRoomView(net.room)}
   else openRoom();
 }
 function showRoomAfterMatch(room){
   if(room)net.room=room;
+  net.awaitingMap=false;
   state='menu';$('#result').hidden=true;$('#menu').hidden=true;$('#roomBrowser').hidden=true;$('#room').hidden=false;
   if(net.room)updateRoomView(net.room);
 }
