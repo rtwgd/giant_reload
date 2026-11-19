@@ -38,6 +38,8 @@ body.mouse-locked,body.mouse-locked *{cursor:none!important}
 #banner{position:absolute;left:50%;top:24%;transform:translateX(-50%);text-align:center;font-family:'Dela Gothic One',var(--f-disp);font-size:24px;color:#f4ecd6;text-shadow:0 2px 0 #000,0 0 14px #000;opacity:0;transition:opacity .2s;white-space:nowrap;max-width:92%}
 #banner.on{opacity:1}
 #banner small{display:block;font-family:var(--f-disp);font-size:13px;font-weight:500;color:#cfc4a8;margin-top:4px}
+#spectator{position:absolute;left:50%;top:calc(var(--gt) + 52px);transform:translateX(-50%);display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--paper);color:var(--ink);border:2px solid var(--ink);border-radius:6px;pointer-events:auto;font-weight:700;white-space:nowrap}
+#spectator button{font:inherit;color:var(--ink);background:#f6efdc;border:1px solid var(--ink);border-radius:4px;padding:4px 8px;cursor:pointer}
 #dock{position:absolute;left:50%;bottom:var(--gb);transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px}
 #chip{padding:3px 12px;border-radius:4px;font-size:12px;font-weight:700;background:var(--paper);color:var(--dim);border:2px solid var(--ink);white-space:nowrap}
 #chip.ready{background:var(--yel);color:var(--ink)}#chip.load{background:var(--blue);color:#fff}
@@ -119,6 +121,7 @@ kbd{font-family:var(--f-mono);font-size:11px;background:#fff8e6;border:1px solid
   <div id="tools"><button class="panel fsb" id="fsBtn" aria-label="全画面">⛶</button><button id="pauseBtn" class="panel" aria-label="一時停止">Ⅱ</button></div>
   <div id="feed"></div>
   <div id="banner"></div>
+  <div id="spectator" hidden><button id="spectatorPrev" type="button" aria-label="前のプレイヤー">◀</button><span id="spectatorName">観戦中</span><button id="spectatorNext" type="button" aria-label="次のプレイヤー">▶</button></div>
   <div id="dock">
     <div id="chip" class="empty"></div>
     <div id="items"></div>
@@ -184,7 +187,7 @@ kbd{font-family:var(--f-mono);font-size:11px;background:#fff8e6;border:1px solid
     <p id="roomStatus" class="lead">サーバーに接続中…</p>
     <div class="room-code-row"><span>部屋コード</span><strong id="roomCode">なし</strong></div>
     <div id="roomPlayers" class="room-players"></div>
-    <div id="ownerSettings" hidden><label>ゲーム時間（秒）<input id="roomTime" class="room-number" type="number" min="30" max="1800" value="180"></label><label>勝利キル数<input id="roomKills" class="room-number" type="number" min="1" max="100" value="10"></label><label>最大人数<input id="roomMax" class="room-number" type="number" min="2" max="32" value="8"></label><label>ボット人数<input id="roomBots" class="room-number" type="number" min="0" max="16" step="1" value="3"></label><label class="room-check"><input id="roomTeamMode" type="checkbox"> チーム戦</label><label>チーム数<select id="roomTeamCount" class="room-number"><option value="2">2チーム</option><option value="3">3チーム</option><option value="4">4チーム</option></select></label><label>チーム分け<select id="roomTeamAssignment" class="room-number"><option value="random">ランダム</option><option value="manual">手動</option></select></label><label>マップサイズ<select id="roomMapSize" class="room-number"><option value="small">小</option><option value="medium" selected>中</option><option value="large">大</option></select></label><label class="room-check"><input id="roomAimAssist" type="checkbox" checked> 弓の照準を自動補正</label></div>
+    <div id="ownerSettings" hidden><label>ゲーム時間（秒）<input id="roomTime" class="room-number" type="number" min="30" max="1800" value="180"></label><label>勝利キル数<input id="roomKills" class="room-number" type="number" min="1" max="100" value="10"></label><label>最大人数<input id="roomMax" class="room-number" type="number" min="2" max="32" value="8"></label><label>ボット人数<input id="roomBots" class="room-number" type="number" min="0" max="16" step="1" value="3"></label><label class="room-check"><input id="roomTeamMode" type="checkbox"> チーム戦</label><label class="room-check"><input id="roomSurvival" type="checkbox"> 生き残り戦</label><label>チーム数<select id="roomTeamCount" class="room-number"><option value="2">2チーム</option><option value="3">3チーム</option><option value="4">4チーム</option></select></label><label>チーム分け<select id="roomTeamAssignment" class="room-number"><option value="random">ランダム</option><option value="manual">手動</option></select></label><label>マップサイズ<select id="roomMapSize" class="room-number"><option value="small">小</option><option value="medium" selected>中</option><option value="large">大</option></select></label><label class="room-check"><input id="roomAimAssist" type="checkbox" checked> 弓の照準を自動補正</label></div>
     <div id="teamAssignments" class="team-setup" hidden></div>
     <button class="btn" data-open-control-settings type="button">操作プリセット・設定</button>
     <button class="btn go" id="startRoomBtn" disabled>オーナーがゲーム開始</button>
@@ -284,7 +287,7 @@ const angDiff=(a,b)=>{let d=(b-a)%(Math.PI*2);if(d>Math.PI)d-=Math.PI*2;if(d<-Ma
 const C={ARROW_V:15,SMALL_SPEED:4.2,GIANT_SPEED:2.8,RELOAD_T:.9,GIANT_MAX:2,LOCKOUT:.8,VIS_SMALL:6.5,VIS_GIANT:11,REVEAL:13,MATCH_T:180,TARGET:10,CRATE_MAX:4,DRAW_T:.45};
 const MAP_SIZES={small:{w:8,h:6,label:'小'},medium:{w:10,h:8,label:'中'},large:{w:13,h:10,label:'大'}};
 const TEAM_COLORS=['#c8412f','#2f6f8f','#708d37','#9a5c9e'];
-let matchRules={time:C.MATCH_T,kills:C.TARGET,mapSize:'medium',bots:3,aimAssist:true,teamMode:false,teamCount:2,teamAssignment:'random',botTeams:[]};
+let matchRules={time:C.MATCH_T,kills:C.TARGET,mapSize:'medium',bots:3,aimAssist:true,teamMode:false,survival:false,teamCount:2,teamAssignment:'random',botTeams:[]};
 const TYPES={n:{name:'通常矢',icon:'矢',key:'1',max:15,col:'#2a2420'},f:{name:'フラッシュ',icon:'閃',key:'2',max:3,col:'#d48a00'},p:{name:'貫通矢',icon:'貫',key:'3',max:2,col:'#8b48a3'}};
 const TYPE_KEYS=['n','f','p'];
 const DIFF={easy:{react:.75,err:.2,turn:4.5,spd:.88,scout:12},normal:{react:.4,err:.1,turn:7.5,spd:1,scout:8.5},hard:{react:.2,err:.045,turn:12,spd:1.06,scout:6}};
@@ -490,11 +493,15 @@ function bfsPath(sx,sy,pred,maxD){
 /* ---------- entities ---------- */
 let nextId=1, T=0, state='menu', timeLeft=C.MATCH_T;
 let player=null, ents=[], decoys=[], arrows=[], fx=[], crates=[], crateT=6, feed=[];
+let spectatorIndex=0;
 const cam={x:0,y:0,z:40,g:0};
+function getSpectatorTargets(){return ents.filter(e=>e.alive&&(e.isPlayer||e.isRemote))}
+function getSpectatorTarget(){const targets=getSpectatorTargets();return targets.length?targets[((spectatorIndex%targets.length)+targets.length)%targets.length]:null}
+function cycleSpectator(direction){const targets=getSpectatorTargets();if(!targets.length)return;const current=targets.indexOf(getSpectatorTarget());spectatorIndex=(current+direction+targets.length)%targets.length}
 function mkEnt(name,color,isPlayer){
   return {id:nextId++,name,color,isPlayer,x:1.5,y:1.5,vx:0,vy:0,ang:0,g:0,hold:0,lock:0,rl:0,rlBy:{n:0,f:0,p:0},loaded:{n:false,f:false,p:false},nocked:null,
     ammo:{n:15,f:3,p:2},sel:'n',shield:1,shUp:false,shT:0,decoys:2,decoyCD:0,cd:0,draw:0,alive:true,resp:0,inv:0,
-    kills:0,deaths:0,blind:0,ai:isPlayer?null:{path:null,pi:0,rp:0,gk:-1,goal:null,tid:null,seen:0,last:null,err:0,sd:1,sdT:0,
+    kills:0,deaths:0,eliminated:false,blind:0,ai:isPlayer?null:{path:null,pi:0,rp:0,gk:-1,goal:null,tid:null,seen:0,last:null,err:0,sd:1,sdT:0,
       scoutT:rnd(3,8),scoutH:0,hide:null,hideAt:-9,blindDir:0,bt:0,stk:0,sx:0,sy:0,want:false}};
 }
 function resetLoadout(e){
@@ -606,12 +613,15 @@ function flashAt(x,y,owner,direct){
 }
 function kill(v,k){
   if(!v.alive)return;
-  v.alive=false;v.resp=2.8;v.deaths++;v.nocked=null;v.loaded={n:false,f:false,p:false};v.shUp=false;v.g=0;
+  v.alive=false;v.eliminated=matchRules.survival;v.resp=matchRules.survival?0:2.8;v.deaths++;v.nocked=null;v.loaded={n:false,f:false,p:false};v.shUp=false;v.g=0;
   if(k&&k!==v)k.kills++;
+  if(k&&k!==v)for(const type of TYPE_KEYS)k.ammo[type]=TYPES[type].max;
+  if(matchRules.survival&&v===player)netSend('eliminated');
   addFx(v.x,v.y,'ring',.6);sfx(v.isPlayer?'hit':'kill');
   if(v.isPlayer&&navigator.vibrate){try{navigator.vibrate(120)}catch(e){}}
   pushFeed(k&&k!==v?`<b style="color:${k.color}">${k.name}</b> → <b style="color:${v.color}">${v.name}</b>`:`<b style="color:${v.color}">${v.name}</b> 脱落`);
-  if(k&&k===player&&v!==player)toast('撃破','',900);
+  if(k&&k===player&&v!==player)toast('撃破','弓の矢を補充',900);
+  if(matchRules.survival)return;
   if(matchRules.teamMode){if(teamTotals().some(total=>total>=matchRules.kills))endMatch()}
   else if(k&&k.kills>=matchRules.kills)endMatch();
 }
@@ -677,6 +687,11 @@ window.addEventListener('keydown',e=>{
   }
   if(keyDown('pause')){if(state==='play')pauseGame();else if(state==='pause')resumeGame();return}
   if(state!=='play')return;
+  if(matchRules.survival&&player&&!player.alive){
+    if(e.code==='ArrowLeft'||keyDown('weaponPrev'))cycleSpectator(-1);
+    else if(e.code==='ArrowRight'||keyDown('weaponNext'))cycleSpectator(1);
+    return;
+  }
   if(keyDown('weaponN'))selectType('n');
   else if(keyDown('weaponF'))selectType('f');
   else if(keyDown('weaponP'))selectType('p');
@@ -806,8 +821,13 @@ function toast(a,b,ms){
 const setTxt=(el,t)=>{if(el.textContent!==t)el.textContent=t};
 let scoreAcc=0;
 function updateHud(dt){
-  const m=Math.max(0,timeLeft),mm=Math.floor(m/60),ss=Math.floor(m%60);setTxt($('#tm'),mm+':'+String(ss).padStart(2,'0'));
   const p=player;
+  const m=Math.max(0,timeLeft),mm=Math.floor(m/60),ss=Math.floor(m%60);
+  setTxt($('#timer small'),matchRules.survival?'生存者':'残り時間');
+  setTxt($('#tm'),matchRules.survival?`${getSpectatorTargets().length}/${net.players.length}`:mm+':'+String(ss).padStart(2,'0'));
+  const spectating=matchRules.survival&&!p.alive;
+  $('#dock').hidden=spectating;$('#spectator').hidden=!spectating;
+  if(spectating){const target=getSpectatorTarget();setTxt($('#spectatorName'),target?`観戦中：${target.name}`:'観戦中');}
   for(const t of TYPE_KEYS){const s=slotEls[t];setTxt(s.ct,String(p.ammo[t])+(p.loaded[t]?' ✓':''));s.el.classList.toggle('sel',p.sel===t);s.el.classList.toggle('empty',p.ammo[t]<=0&&!p.loaded[t]);s.el.classList.toggle('on',p.loaded[t])}
   const chip=$('#chip');let txt,cls;
   if(!p.alive){txt='撃破された';cls='empty'}
@@ -823,10 +843,11 @@ function updateHud(dt){
     const rows=[...ents].sort((a,b)=>(matchRules.teamMode?(a.team??0)-(b.team??0):0)||b.kills-a.kills||a.deaths-b.deaths);
     $('#score').innerHTML=(matchRules.teamMode?teamTotals().map((total,i)=>`<div class="row team-total"><span class="nm">チーム${i+1} 合計</span><span class="k">${total}</span></div>`).join(''):'')
       +rows.map(e=>`<div class="row${matchRules.teamMode?' player-score':''}${e.isPlayer?' me':''}${e.alive?'':' dead'}"><span class="dot" style="background:${e.color}"></span><span class="nm">${matchRules.teamMode?`T${e.team+1} `:''}${e.name}</span><span class="k">${e.kills}</span></div>`).join('')
-      +`<div class="row" style="color:var(--dim);font-size:10px;letter-spacing:.1em"><span class="nm">${matchRules.teamMode?'チーム合計・先取':'先取'} ${matchRules.kills} キル</span></div>`;
+      +`<div class="row" style="color:var(--dim);font-size:10px;letter-spacing:.1em"><span class="nm">${matchRules.survival?'最後の一人が勝利':matchRules.teamMode?'チーム合計・先取':'先取'}${matchRules.survival?'':` ${matchRules.kills} キル`}</span></div>`;
   }
   const bn=$('#banner');
-  if(!p.alive){bn.innerHTML=`撃破された<small>復活まで ${Math.max(0,Math.ceil(p.resp))}</small>`;bn.classList.add('on');bannerT=T+.3}
+  if(!p.alive&&!matchRules.survival){bn.innerHTML=`撃破された<small>復活まで ${Math.max(0,Math.ceil(p.resp))}</small>`;bn.classList.add('on');bannerT=T+.3}
+  else if(spectating){bn.innerHTML='脱落<small>観戦中です</small>';bn.classList.add('on');bannerT=T+.3}
   else if(bn.classList.contains('on')&&T>bannerT)bn.classList.remove('on');
 }
 
@@ -967,7 +988,7 @@ function update(dt){
   T+=dt;timeLeft-=dt;
   for(const e of ents){
     if(e.isRemote)continue;
-    if(!e.alive){e.resp-=dt;if(e.resp<=0)respawn(e);continue}
+    if(!e.alive){if(!matchRules.survival&&!e.eliminated){e.resp-=dt;if(e.resp<=0)respawn(e)}continue}
     if(e.isPlayer){if(state==='play')playerTick(e,dt);else{e.inv=0;e.vx*=.7;e.vy*=.7;tickBody(e,dt,false)}}else aiTick(e,dt);
     for(let i=crates.length-1;i>=0;i--){
       const c=crates[i];
@@ -1006,7 +1027,7 @@ function update(dt){
   smokes=smokes.filter(s=>s.t<s.life);
   for(const f of fx)f.t+=dt;
   fx=fx.filter(f=>f.t<f.max);
-  if(timeLeft<=0)endMatch();
+  if(timeLeft<=0&&!matchRules.survival)endMatch();
 }
 function landArrow(a){
   a.alive=false;
@@ -1032,7 +1053,13 @@ function endMatch(remote=false){
   state='over';
   $('#pause').hidden=true;
   const rows=[...ents].sort((a,b)=>b.kills-a.kills||a.deaths-b.deaths);
-  if(matchRules.teamMode){
+  if(matchRules.survival){
+    const winnerId=net.survivorWinnerId;
+    const winner=net.players.find(member=>member.id===winnerId);
+    $('#resTitle').textContent=winnerId?winnerId===net.id?'勝利':`${winner?.name||'相手'} の勝ち`:'引き分け';
+    $('#resTitle').style.color=winnerId===net.id?'var(--amber)':'var(--ink)';
+    $('#resTable').innerHTML='<tr><th>結果</th><th>名前</th><th>キル</th></tr>'+rows.map(e=>`<tr class="${e.isPlayer?'me':''}"><td>${e.netId===winnerId?'優勝':e.eliminated?'脱落':'生存'}</td><td>${e.name}</td><td>${e.kills}</td></tr>`).join('');
+  }else if(matchRules.teamMode){
     const totals=teamTotals(),ranking=totals.map((kills,team)=>({kills,team})).sort((a,b)=>b.kills-a.kills);
     const winner=ranking[0],tie=ranking[1]?.kills===winner.kills;
     $('#resTitle').textContent=tie?'引き分け':winner.team===player.team?'勝利':'チーム'+(winner.team+1)+' の勝ち';
@@ -1110,10 +1137,11 @@ function shade(hex,k){
 }
 function render(dt){
   const p=player;
-  cam.g=lerp(cam.g,p.g,Math.min(1,dt*8));
+  const viewTarget=matchRules.survival&&!p.alive?getSpectatorTarget():p;
+  cam.g=lerp(cam.g,viewTarget?.g||0,Math.min(1,dt*8));
   const baseZ=clamp(Math.min(W,H)/10,28,62),zt=baseZ*(1-.38*cam.g);
   cam.z=zt;
-  cam.x=lerp(cam.x,p.x,Math.min(1,dt*9));cam.y=lerp(cam.y,p.y,Math.min(1,dt*9));
+  cam.x=lerp(cam.x,viewTarget?.x??p.x,Math.min(1,dt*9));cam.y=lerp(cam.y,viewTarget?.y??p.y,Math.min(1,dt*9));
   const z=cam.z,ox=W/2-cam.x*z,oy=H/2-cam.y*z;
   ctx.setTransform(DPR,0,0,DPR,0,0);
   ctx.fillStyle='#1c1713';ctx.fillRect(0,0,W,H);
@@ -1160,13 +1188,13 @@ function render(dt){
     ctx.fillStyle=p.sel==='p'?TYPES.p.col:'#2a2420';ctx.fillRect(ex-3,ey-3,6,6);
   }
   // fog of war
-  const gz=p.g,blind=p.blind>0;
+  const observer=viewTarget||p,gz=observer.g,blind=observer.blind>0;
   fctx.setTransform(DPR,0,0,DPR,0,0);
   fctx.globalCompositeOperation='source-over';fctx.clearRect(0,0,W,H);
-  fctx.fillStyle='rgba(26,20,16,'+(p.alive?.94:.8)+')';fctx.fillRect(0,0,W,H);
+  fctx.fillStyle='rgba(26,20,16,'+(observer.alive?.94:.8)+')';fctx.fillRect(0,0,W,H);
   fctx.globalCompositeOperation='destination-out';
-  const px=p.x*z+ox,py=p.y*z+oy,Rmax=lerp(C.VIS_SMALL,C.VIS_GIANT,gz);
-  fctx.beginPath();vis(p.x,p.y,blind?1.4:C.VIS_SMALL,C.VIS_GIANT,blind?0:gz).forEach((q,i)=>{const x=px+q[0]*z,y=py+q[1]*z;if(i)fctx.lineTo(x,y);else fctx.moveTo(x,y)});
+  const px=observer.x*z+ox,py=observer.y*z+oy,Rmax=lerp(C.VIS_SMALL,C.VIS_GIANT,gz);
+  fctx.beginPath();vis(observer.x,observer.y,blind?1.4:C.VIS_SMALL,C.VIS_GIANT,blind?0:gz).forEach((q,i)=>{const x=px+q[0]*z,y=py+q[1]*z;if(i)fctx.lineTo(x,y);else fctx.moveTo(x,y)});
   fctx.closePath();
   const hr=(blind?1.4:Rmax)*z,fg=fctx.createRadialGradient(px,py,hr*.35,px,py,hr);
   fg.addColorStop(0,'rgba(0,0,0,1)');fg.addColorStop(.75,'rgba(0,0,0,.95)');fg.addColorStop(1,'rgba(0,0,0,.25)');
@@ -1175,14 +1203,14 @@ function render(dt){
   ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(fogc,0,0);ctx.setTransform(DPR,0,0,DPR,0,0);
   // entities (visible ones only)
   const list=[];
-  for(const e of ents)if(e.alive&&(e===p||canSee(p,e)))list.push(e);
-  for(const d of decoys)if(canSee(p,d)||d.owner===p)list.push(d);
+  for(const e of ents)if(e.alive&&(e===observer||canSee(observer,e)))list.push(e);
+  for(const d of decoys)if(canSee(observer,d)||d.owner===observer)list.push(d);
   list.sort((a,b)=>a.g-b.g||a.y-b.y);
   for(const e of list){
-    drawEnt(e,z,ox,oy,e===p);
+    drawEnt(e,z,ox,oy,e===observer);
     if(e!==p&&!e.isDecoy||e.isDecoy&&e.owner!==p){
       const sx=e.x*z+ox,sy=e.y*z+oy-e.g*.55*z,rr=(.3+.72*e.g)*z;
-      if(p.g>.6||e.g>.6){
+      if(observer.g>.6||e.g>.6){
         const pulse=1+.12*Math.sin(T*9);
         ctx.strokeStyle=e.g>.6?'#c8412f':'#d8628a';ctx.lineWidth=2.5;ctx.setLineDash([5,5]);ctx.beginPath();ctx.arc(sx,sy,(rr+8)*pulse,0,6.283);ctx.stroke();ctx.setLineDash([]);
         if(e.g>.6){ctx.fillStyle='#c8412f';ctx.font='700 13px sans-serif';ctx.textAlign='center';ctx.fillText('巨大化！',sx,sy-rr-22)}
@@ -1197,7 +1225,7 @@ function render(dt){
     ctx.font='700 13px sans-serif';ctx.textAlign='center';ctx.lineWidth=4;ctx.strokeStyle='#1c1713';ctx.strokeText(label,(sx+ex)/2,(sy+ey)/2-8);ctx.fillStyle=color;ctx.fillText(label,(sx+ex)/2,(sy+ey)/2-8);
   }
   for(const a of visibleArrows){
-    if((!a.lob&&a.t!=='p')||Math.hypot(a.x-p.x,a.y-p.y)>C.VIS_GIANT+2)continue;
+    if((!a.lob&&a.t!=='p')||Math.hypot(a.x-observer.x,a.y-observer.y)>C.VIS_GIANT+2)continue;
     const sx=a.x*z+ox,sy=a.y*z+oy,ux=a.vx/a.spd,uy=a.vy/a.spd;
     const color=a.t==='p'?TYPES.p.col:'#ff6a4d';
     ctx.lineCap='round';ctx.strokeStyle='#1c1713';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(sx-ux*1.4*z,sy-uy*1.4*z);ctx.lineTo(sx,sy);ctx.stroke();
@@ -1218,7 +1246,7 @@ function render(dt){
   }
   // overlays
   if(blind){ctx.fillStyle='rgba(255,255,255,'+Math.min(.96,p.blind*.9)+')';ctx.fillRect(0,0,W,H)}
-  if(!p.alive){ctx.fillStyle='rgba(0,0,0,.35)';ctx.fillRect(0,0,W,H)}
+  if(!p.alive&&!matchRules.survival){ctx.fillStyle='rgba(0,0,0,.35)';ctx.fillRect(0,0,W,H)}
   if(gz>.02){const vg=ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*.35,W/2,H/2,Math.max(W,H)*.75);vg.addColorStop(0,'rgba(200,65,47,0)');vg.addColorStop(1,'rgba(200,65,47,'+(.22*gz)+')');ctx.fillStyle=vg;ctx.fillRect(0,0,W,H)}
 }
 
@@ -1254,7 +1282,7 @@ function toggleFs(){
 }
 document.querySelectorAll('.fsb').forEach(b=>{if(!canFs)b.hidden=true;else b.addEventListener('click',toggleFs)});
 /* ---------- menu wiring ---------- */
-const net={ws:null,id:null,room:null,players:[],started:false,ended:false,awaitingMap:false,stateAcc:0};
+const net={ws:null,id:null,room:null,players:[],started:false,ended:false,awaitingMap:false,stateAcc:0,survivorWinnerId:null};
 function netSend(type,payload={}){if(net.ws&&net.ws.readyState===WebSocket.OPEN)net.ws.send(JSON.stringify({type,...payload}))}
 function roomStatus(t){$('#roomStatus').textContent=t}
 function browserStatus(t){$('#browserStatus').textContent=t}
@@ -1314,8 +1342,8 @@ function updateRoomView(room){
     return `<div>${settings.teamMode?`[チーム${team+1}] `:''}🤖 ${name}</div>`;
   }).join('');
   $('#roomPlayers').innerHTML=`<div>参加人数：${players.length}/${room.maxPlayers}人</div>${playerRows}${botRows}`||'<div>参加者を待っています</div>';
-  const owner=room.ownerId===net.id;$('#ownerSettings').hidden=!owner;$('#startRoomBtn').disabled=!owner||room.players.length<1;$('#startRoomBtn').textContent=owner?'ゲーム開始':'オーナーがゲーム開始';
-  if(owner){$('#roomTime').value=room.settings.time;$('#roomKills').value=room.settings.kills;$('#roomMax').value=room.maxPlayers;$('#roomBots').value=room.settings.bots??3;$('#roomMapSize').value=room.settings.mapSize||'medium';$('#roomAimAssist').checked=room.settings.aimAssist!==false;$('#roomTeamMode').checked=room.settings.teamMode===true;$('#roomTeamCount').value=String(room.settings.teamCount||2);$('#roomTeamAssignment').value=room.settings.teamAssignment||'random';$('#roomTeamCount').disabled=!room.settings.teamMode;$('#roomTeamAssignment').disabled=!room.settings.teamMode;roomStatus('部屋を作成しました。参加者を待っています')}
+  const owner=room.ownerId===net.id,survival=room.settings.survival===true;$('#ownerSettings').hidden=!owner;$('#startRoomBtn').disabled=!owner||room.players.length<(survival?2:1);$('#startRoomBtn').textContent=owner?(survival?'生き残り戦を開始':'ゲーム開始'):'オーナーがゲーム開始';
+  if(owner){$('#roomTime').value=room.settings.time;$('#roomKills').value=room.settings.kills;$('#roomMax').value=room.maxPlayers;$('#roomBots').value=room.settings.bots??3;$('#roomBots').disabled=survival;$('#roomMapSize').value=room.settings.mapSize||'medium';$('#roomAimAssist').checked=room.settings.aimAssist!==false;$('#roomTeamMode').checked=room.settings.teamMode===true;$('#roomTeamMode').disabled=survival;$('#roomSurvival').checked=survival;$('#roomTeamCount').value=String(room.settings.teamCount||2);$('#roomTeamAssignment').value=room.settings.teamAssignment||'random';$('#roomTeamCount').disabled=!room.settings.teamMode;$('#roomTeamAssignment').disabled=!room.settings.teamMode;roomStatus(survival?'生き残り戦では参加プレイヤーだけで対戦します。2人以上で開始できます':'部屋を作成しました。参加者を待っています')}
   else roomStatus('オーナーがゲームを開始するまでお待ちください');
   renderTeamAssignments(room,owner);
 }
@@ -1330,10 +1358,11 @@ function connectRoomServer(){
     if(m.type==='room_created'||m.type==='room_state')updateRoomView(m.room);
     if(m.type==='error'){roomStatus(m.message);browserStatus(m.message)}
     if(m.type==='return_to_room')showRoomAfterMatch(m.room);
-    if(m.type==='game_start'&&!$('#room').hidden){const bots=m.settings.bots==null?3:Number(m.settings.bots);matchRules={time:m.settings.time,kills:m.settings.kills,mapSize:m.settings.mapSize||'medium',bots:Math.max(0,Math.min(16,Number.isFinite(bots)?bots:3)),aimAssist:m.settings.aimAssist!==false,teamMode:m.settings.teamMode===true,teamCount:Math.max(2,Math.min(4,Number(m.settings.teamCount)||2)),teamAssignment:m.settings.teamAssignment||'random',botTeams:Array.isArray(m.settings.botTeams)?m.settings.botTeams:[]};net.players=m.players||[];net.started=true;net.ended=false;net.awaitingMap=false;if(net.room?.ownerId===net.id){$('#room').hidden=true;startMatch()}else{net.awaitingMap=true;roomStatus('オーナーのマップを読み込み中…')}}
-    if(m.type==='game_end'){net.ended=true;net.started=false;net.awaitingMap=false;endMatch(true)}
+    if(m.type==='game_start'&&!$('#room').hidden){const bots=m.settings.bots==null?3:Number(m.settings.bots);matchRules={time:m.settings.time,kills:m.settings.kills,mapSize:m.settings.mapSize||'medium',bots:Math.max(0,Math.min(16,Number.isFinite(bots)?bots:3)),aimAssist:m.settings.aimAssist!==false,teamMode:m.settings.teamMode===true,survival:m.settings.survival===true,teamCount:Math.max(2,Math.min(4,Number(m.settings.teamCount)||2)),teamAssignment:m.settings.teamAssignment||'random',botTeams:Array.isArray(m.settings.botTeams)?m.settings.botTeams:[]};net.players=m.players||[];net.started=true;net.ended=false;net.awaitingMap=false;net.survivorWinnerId=null;if(net.room?.ownerId===net.id){$('#room').hidden=true;startMatch()}else{net.awaitingMap=true;roomStatus('オーナーのマップを読み込み中…')}}
+    if(m.type==='survivor_state'&&matchRules.survival){const aliveIds=new Set(m.aliveIds||[]);for(const e of ents){if(e.netId&&!aliveIds.has(e.netId)){e.alive=false;e.eliminated=true;e.resp=0}}}
+    if(m.type==='game_end'){net.ended=true;net.started=false;net.awaitingMap=false;net.survivorWinnerId=m.winnerId||null;endMatch(true)}
     if(m.type==='map'&&m.grid){grid=Uint8Array.from(m.grid);GW=m.GW;GH=m.GH;floors=[];for(let i=0;i<grid.length;i++)if(!grid[i])floors.push(i);if(net.awaitingMap&&net.started){net.awaitingMap=false;$('#room').hidden=true;startMatch(true)}}
-    if(m.type==='peer_state'){const e=ents.find(x=>x.netId===m.id);if(e&&e.isRemote&&m.state&&typeof m.state==='object'){const {arrows:peerArrows,...peerState}=m.state;Object.assign(e,peerState);e.netArrows=Array.isArray(peerArrows)?peerArrows:[]}}
+    if(m.type==='peer_state'){const e=ents.find(x=>x.netId===m.id);if(e&&e.isRemote&&m.state&&typeof m.state==='object'){const {arrows:peerArrows,...peerState}=m.state;Object.assign(e,peerState);if(matchRules.survival&&!e.alive){e.eliminated=true;e.resp=0}e.netArrows=Array.isArray(peerArrows)?peerArrows:[]}}
     if(m.type==='remote_hit'&&player&&player.alive){const attacker=ents.find(x=>x.netId===m.attackerId)||player;if(m.type==='remote_hit'&&m.arrowType==='f')flashAt(player.x,player.y,attacker,player);else kill(player,attacker)}
   };
   net.ws.onerror=()=>roomStatus('サーバーに接続できません。server.jsを起動してください');
@@ -1343,7 +1372,7 @@ function readPlayerName(){try{return localStorage.getItem('gr_name')||''}catch(e
 function savePlayerName(name){try{localStorage.setItem('gr_name',name)}catch(error){if(error?.name!=='SecurityError')throw error}}
 function openRoom(){state='menu';$('#menu').hidden=true;$('#room').hidden=true;$('#roomBrowser').hidden=false;$('#browserName').value=readPlayerName();$('#publicRooms').innerHTML='<div>読み込み中…</div>';connectRoomServer()}
 function startSinglePlayer(){
-  if(net.ws)net.ws.close();net.ws=null;net.room=null;net.players=[];net.started=false;net.awaitingMap=false;matchRules={time:C.MATCH_T,kills:C.TARGET,mapSize:'medium',bots:cfg.bots,aimAssist:true,teamMode:false,teamCount:2,teamAssignment:'random',botTeams:[]};
+  if(net.ws)net.ws.close();net.ws=null;net.room=null;net.players=[];net.started=false;net.awaitingMap=false;matchRules={time:C.MATCH_T,kills:C.TARGET,mapSize:'medium',bots:cfg.bots,aimAssist:true,teamMode:false,survival:false,teamCount:2,teamAssignment:'random',botTeams:[]};
   $('#menu').hidden=true;$('#roomBrowser').hidden=true;$('#room').hidden=true;startMatch();
 }
 function joinPublicRoom(id){const name=$('#browserName').value.trim()||'Player';savePlayerName(name);netSend('join_room',{name,roomId:id})}
@@ -1391,8 +1420,10 @@ $('#joinByCodeBtn').addEventListener('click',()=>{const name=$('#browserName').v
 $('#refreshRoomsBtn').addEventListener('click',()=>netSend('list_rooms'));
 $('#leaveBrowserBtn').addEventListener('click',leaveRoom);
 $('#startRoomBtn').addEventListener('click',()=>netSend('start_game'));
-const sendRoomSettings=()=>netSend('set_settings',{time:$('#roomTime').value,kills:$('#roomKills').value,maxPlayers:$('#roomMax').value,bots:$('#roomBots').value,mapSize:$('#roomMapSize').value,aimAssist:$('#roomAimAssist').checked,teamMode:$('#roomTeamMode').checked,teamCount:$('#roomTeamCount').value,teamAssignment:$('#roomTeamAssignment').value});
+const sendRoomSettings=()=>netSend('set_settings',{time:$('#roomTime').value,kills:$('#roomKills').value,maxPlayers:$('#roomMax').value,bots:$('#roomBots').value,mapSize:$('#roomMapSize').value,aimAssist:$('#roomAimAssist').checked,teamMode:$('#roomTeamMode').checked,survival:$('#roomSurvival').checked,teamCount:$('#roomTeamCount').value,teamAssignment:$('#roomTeamAssignment').value});
 $('#roomTime').addEventListener('change',sendRoomSettings);$('#roomKills').addEventListener('change',sendRoomSettings);$('#roomMax').addEventListener('change',sendRoomSettings);$('#roomBots').addEventListener('change',sendRoomSettings);$('#roomMapSize').addEventListener('change',sendRoomSettings);$('#roomAimAssist').addEventListener('change',sendRoomSettings);$('#roomTeamMode').addEventListener('change',sendRoomSettings);$('#roomTeamCount').addEventListener('change',sendRoomSettings);$('#roomTeamAssignment').addEventListener('change',sendRoomSettings);
+$('#roomSurvival').addEventListener('change',()=>{if($('#roomSurvival').checked){$('#roomTeamMode').checked=false;$('#roomBots').value='0'}sendRoomSettings()});
+$('#spectatorPrev').addEventListener('click',()=>cycleSpectator(-1));$('#spectatorNext').addEventListener('click',()=>cycleSpectator(1));
 $('#leaveRoomBtn').addEventListener('click',leaveRoom);
 $('#againBtn').addEventListener('click',()=>{
   if(net.room&&net.ws&&net.ws.readyState===WebSocket.OPEN){

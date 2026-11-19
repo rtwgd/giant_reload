@@ -40,13 +40,25 @@ function normalizeBotTeams(room,count=room.settings.bots){
   room.settings.botTeams=[];
   for(let i=0;i<count;i++)room.settings.botTeams.push(cleanTeam(teams[i],room.settings.teamCount)??teamOfLeastMembers(room));
 }
+function survivorIds(room){return [...room.survivors]}
+function finishSurvival(room){
+  if(!room.started||!room.settings.survival)return;
+  room.started=false;room.awaitingReturn=true;
+  broadcast(room,'game_end',{winnerId:room.survivors.size===1?[...room.survivors][0]:null});
+  broadcast(room,'room_state',{room:roomState(room)});
+  broadcastAll('room_list',{rooms:roomList()});
+}
 function roomState(room){return {id:room.id,name:room.name,code:room.private?room.code:null,codeRequired:room.private,started:room.started,ownerId:room.ownerId,settings:room.settings,maxPlayers:room.maxPlayers,players:[...room.clients].map(c=>({id:c.id,name:c.name,team:c.team}))}}
 function roomList(){return [...rooms.values()].filter(room=>!room.private).map(room=>({id:room.id,name:room.name,codeRequired:false,started:room.started,players:room.clients.size,maxPlayers:room.maxPlayers,settings:room.settings}))}
 function leave(client){
   const room=client.room;if(!room)return;
   room.clients.delete(client);names.delete(client.id);
+  if(room.started&&room.settings.survival&&room.survivors.delete(client.id)){
+    broadcast(room,'survivor_state',{aliveIds:survivorIds(room)});
+    if(room.survivors.size<=1)finishSurvival(room);
+  }
   if(room.settings.teamMode&&room.settings.teamAssignment==='manual')normalizeBotTeams(room);
-  if(room.ownerId===client.id){room.ownerId=room.clients.values().next().value?.id||null;room.started=false}
+  if(room.ownerId===client.id){room.ownerId=room.clients.values().next().value?.id||null;if(!room.settings.survival)room.started=false}
   if(room.clients.size===0){rooms.delete(room.id);if(room.code)roomCodes.delete(room.code)}else broadcast(room,'room_state',{room:roomState(room)});
   broadcastAll('room_list',{rooms:roomList()});
   client.room=null;
@@ -66,20 +78,21 @@ wss.on('connection',ws=>{
   ws.on('message',raw=>{
     let msg;try{msg=JSON.parse(raw)}catch{return}
     if(msg.type==='create_room'){
-      leave(client);const privateRoom=!!msg.private;const room={id:randomId(),name:cleanRoomName(msg.roomName),private:privateRoom,code:privateRoom?makeCode():null,ownerId:client.id,settings:{time:180,kills:10,mapSize:cleanMapSize(msg.mapSize),bots:3,aimAssist:true,teamMode:false,teamCount:2,teamAssignment:'random',botTeams:[]},maxPlayers:Math.max(2,Math.min(32,Number(msg.maxPlayers)||8)),clients:new Set(),started:false,awaitingReturn:false};if(room.private&&room.code)roomCodes.set(room.code,room);rooms.set(room.id,room);client.name=cleanName(msg.name);client.room=room;client.team=0;room.clients.add(client);normalizeBotTeams(room);send(ws,'room_created',{room:roomState(room)});broadcastAll('room_list',{rooms:roomList()});return;
+      leave(client);const privateRoom=!!msg.private;const room={id:randomId(),name:cleanRoomName(msg.roomName),private:privateRoom,code:privateRoom?makeCode():null,ownerId:client.id,settings:{time:180,kills:10,mapSize:cleanMapSize(msg.mapSize),bots:3,aimAssist:true,teamMode:false,survival:false,teamCount:2,teamAssignment:'random',botTeams:[]},maxPlayers:Math.max(2,Math.min(32,Number(msg.maxPlayers)||8)),clients:new Set(),started:false,awaitingReturn:false,survivors:new Set()};if(room.private&&room.code)roomCodes.set(room.code,room);rooms.set(room.id,room);client.name=cleanName(msg.name);client.room=room;client.team=0;room.clients.add(client);normalizeBotTeams(room);send(ws,'room_created',{room:roomState(room)});broadcastAll('room_list',{rooms:roomList()});return;
     }
     if(msg.type==='join_room'){
       const room=msg.roomId?rooms.get(String(msg.roomId)):findRoomByCode(msg.code);if(!room)return send(ws,'error',{message:'部屋が見つかりません'});if(room.private&&String(msg.code||'').toUpperCase()!==room.code)return send(ws,'error',{message:'部屋コードが違います'});if(room.started)return send(ws,'error',{message:'試合中の部屋には参加できません'});if(room.clients.size>=room.maxPlayers)return send(ws,'error',{message:'この部屋は満員です'});leave(client);client.name=cleanName(msg.name);client.room=room;client.team=room.settings.teamMode&&room.settings.teamAssignment==='manual'?teamOfLeastMembers(room):0;room.clients.add(client);broadcast(room,'room_state',{room:roomState(room)});broadcastAll('room_list',{rooms:roomList()});return;
     }
     if(msg.type==='list_rooms'){send(ws,'room_list',{rooms:roomList()});return}
     const room=client.room;if(!room)return;
-    if(msg.type==='set_settings'&&room.ownerId===client.id&&!room.started){const wasTeamMode=room.settings.teamMode;room.settings={...room.settings,time:Math.max(30,Math.min(1800,Number(msg.time)||180)),kills:Math.max(1,Math.min(100,Number(msg.kills)||10)),mapSize:cleanMapSize(msg.mapSize||room.settings.mapSize),bots:cleanBotCount(msg.bots,room.settings.bots),aimAssist:typeof msg.aimAssist==='boolean'?msg.aimAssist:room.settings.aimAssist,teamMode:typeof msg.teamMode==='boolean'?msg.teamMode:room.settings.teamMode,teamCount:cleanTeamCount(msg.teamCount??room.settings.teamCount),teamAssignment:msg.teamAssignment==='manual'?'manual':msg.teamAssignment==='random'?'random':room.settings.teamAssignment};room.maxPlayers=Math.max(2,Math.min(32,Number(msg.maxPlayers)||room.maxPlayers));if(!wasTeamMode&&room.settings.teamMode)balanceTeams(room);else{for(const member of room.clients)member.team=cleanTeam(member.team,room.settings.teamCount)??teamOfLeastMembers(room);normalizeBotTeams(room)}broadcast(room,'room_state',{room:roomState(room)});broadcastAll('room_list',{rooms:roomList()});return}
+    if(msg.type==='set_settings'&&room.ownerId===client.id&&!room.started){const wasTeamMode=room.settings.teamMode;const survival=typeof msg.survival==='boolean'?msg.survival:room.settings.survival;room.settings={...room.settings,time:Math.max(30,Math.min(1800,Number(msg.time)||180)),kills:Math.max(1,Math.min(100,Number(msg.kills)||10)),mapSize:cleanMapSize(msg.mapSize||room.settings.mapSize),bots:survival?0:cleanBotCount(msg.bots,room.settings.bots),aimAssist:typeof msg.aimAssist==='boolean'?msg.aimAssist:room.settings.aimAssist,teamMode:survival?false:typeof msg.teamMode==='boolean'?msg.teamMode:room.settings.teamMode,survival,teamCount:cleanTeamCount(msg.teamCount??room.settings.teamCount),teamAssignment:msg.teamAssignment==='manual'?'manual':msg.teamAssignment==='random'?'random':room.settings.teamAssignment};room.maxPlayers=Math.max(2,Math.min(32,Number(msg.maxPlayers)||room.maxPlayers));if(!wasTeamMode&&room.settings.teamMode)balanceTeams(room);else{for(const member of room.clients)member.team=cleanTeam(member.team,room.settings.teamCount)??teamOfLeastMembers(room);normalizeBotTeams(room)}broadcast(room,'room_state',{room:roomState(room)});broadcastAll('room_list',{rooms:roomList()});return}
     if(msg.type==='team_assignments'&&room.ownerId===client.id&&!room.started&&room.settings.teamMode&&room.settings.teamAssignment==='manual'){const assignments=Array.isArray(msg.assignments)?msg.assignments:[];for(const item of assignments){const team=cleanTeam(item?.team,room.settings.teamCount);if(team===null)continue;if(item.type==='player'){const member=[...room.clients].find(c=>c.id===item.id);if(member)member.team=team}else if(item.type==='bot'&&Number.isInteger(item.index)&&item.index>=0&&item.index<room.settings.bots)room.settings.botTeams[item.index]=team}normalizeBotTeams(room);broadcast(room,'room_state',{room:roomState(room)});return}
-    if(msg.type==='start_game'&&room.ownerId===client.id&&!room.started&&!room.awaitingReturn){if(room.settings.teamMode){if(room.settings.teamAssignment==='random')balanceTeams(room);normalizeBotTeams(room)}room.started=true;broadcast(room,'game_start',{settings:room.settings,players:roomState(room).players});broadcastAll('room_list',{rooms:roomList()});return}
-    if(msg.type==='game_end'&&room.started){room.started=false;room.awaitingReturn=true;broadcast(room,'game_end');broadcast(room,'room_state',{room:roomState(room)});broadcastAll('room_list',{rooms:roomList()});return}
+    if(msg.type==='start_game'&&room.ownerId===client.id&&!room.started&&!room.awaitingReturn){if(room.settings.survival&&room.clients.size<2)return send(ws,'error',{message:'生き残り戦はプレイヤー2人以上で開始できます'});if(room.settings.teamMode){if(room.settings.teamAssignment==='random')balanceTeams(room);normalizeBotTeams(room)}room.survivors=new Set(room.settings.survival?[...room.clients].map(member=>member.id):[]);room.started=true;broadcast(room,'game_start',{settings:room.settings,players:roomState(room).players});broadcastAll('room_list',{rooms:roomList()});return}
+    if(msg.type==='game_end'&&room.started&&!room.settings.survival){room.started=false;room.awaitingReturn=true;broadcast(room,'game_end');broadcast(room,'room_state',{room:roomState(room)});broadcastAll('room_list',{rooms:roomList()});return}
     if(msg.type==='return_to_room'&&room.ownerId===client.id&&!room.started&&room.awaitingReturn){room.awaitingReturn=false;broadcast(room,'return_to_room',{room:roomState(room)});return}
     if(msg.type==='map'&&room.ownerId===client.id&&room.started){broadcast(room,'map',{grid:msg.grid,GW:msg.GW,GH:msg.GH});return}
-    if(msg.type==='hit'&&room.started){const target=[...room.clients].find(c=>c.id===msg.targetId);if(target)send(target.ws,'remote_hit',{attackerId:msg.attackerId,arrowType:msg.arrowType});return}
+    if(msg.type==='eliminated'&&room.started&&room.settings.survival&&room.survivors.delete(client.id)){broadcast(room,'survivor_state',{aliveIds:survivorIds(room)});if(room.survivors.size<=1)finishSurvival(room);return}
+    if(msg.type==='hit'&&room.started){const target=[...room.clients].find(c=>c.id===msg.targetId);if(target&&(!room.settings.survival||room.survivors.has(target.id)))send(target.ws,'remote_hit',{attackerId:client.id,arrowType:msg.arrowType});return}
     if(msg.type==='state'&&room.started){room.clients.forEach(other=>{if(other!==client)send(other.ws,'peer_state',{id:client.id,state:msg.state})});}
   });
   ws.on('close',()=>leave(client));
